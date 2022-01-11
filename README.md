@@ -12,5 +12,5 @@
 - [x] Built-in Functions (Priority unknown)
 
 ## Want a tutorial on how you can make your own language?
-### Well, are you in luck! I've recently created a tutorial for making [a simple number interpreter from scratch](httpsnumber-interpreter-from-scratch.battledash2.repl.co).
+### Well, are you in luck! I've recently created a tutorial for making [a simple number interpreter from scratch](https://number-interpreter-from-scratch.battledash2.repl.co).
 #### Check it out!
