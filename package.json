@@ -8,6 +8,6 @@
     "start": "node . -c"
   },
   "keywords": ["nodejs", "interpreter", "language", "parser", "lexer", "tokenizer"],
-  "author": "Battledash",
+  "author": "Battledash-2",
   "license": "MIT"
 }
