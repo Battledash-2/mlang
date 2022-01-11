@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "clear && node . -f example.m",
-    "start": "node . -c"
+    "start": "clear && node . -c"
   },
   "keywords": ["nodejs", "interpreter", "language", "parser", "lexer", "tokenizer"],
   "author": "Battledash-2",
