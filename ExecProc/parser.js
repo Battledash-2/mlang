@@ -86,14 +86,36 @@ module.exports = class Parser {
         return this.primary();
     }
 
-    multiplication() {
+    exponent() {
         let left = this.unary();
+        let position = left.position;
+
+        while (this.next?.type == "OPERATOR" && this.next.value == "^") {
+            const operator = this.next.value;
+            this.advance("OPERATOR");
+            const right = this.unary();
+
+            left = {
+                operator,
+                left,
+                right
+            }
+        }
+
+        return {
+            ...left,
+            position
+        };
+    }
+
+    multiplication() {
+        let left = this.exponent();
         let position = left.position;
 
         while (this.next?.type == "OPERATOR" && this.tokens.isMultiplier(this.next)) {
             const operator = this.next.value;
             this.advance("OPERATOR");
-            const right = this.unary();
+            const right = this.exponent();
 
             left = {
                 operator,

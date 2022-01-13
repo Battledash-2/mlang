@@ -1,4 +1,6 @@
 const operations = {
+    "^": (l, r) => l ** r,
+
     "*": (l, r) => l * r,
     "/": (l, r) => l / r,
 

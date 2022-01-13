@@ -2,7 +2,7 @@ const specification = [
     [/^\/\/[^\n]*/, null], // this needs to have a higher precedence
 
     [/^\.?\d+\.?\d*/, "NUMBER"],
-    [/^[\+\-\/\*]/, "OPERATOR"],
+    [/^[\+\-\/\*\^]/, "OPERATOR"],
 
     [/^\(/, "LPAREN"],
     [/^\)/, "RPAREN"],

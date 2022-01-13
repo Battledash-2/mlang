@@ -34,3 +34,5 @@ util.log(f)
 
 util.log(-(1)+2); // operations directly in `log`
 util.log(-1); // negative numbers (all numbers are signed)
+
+util.log(9 ^ .5) // exponents!
