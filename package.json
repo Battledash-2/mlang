@@ -7,6 +7,9 @@
     "test": "clear && node . -f example.m",
     "start": "clear && node . -c"
   },
+  "dependencies": {
+  "cli2json": "^1.0.0"
+  },
   "keywords": ["nodejs", "interpreter", "language", "parser", "lexer", "tokenizer"],
   "author": "Battledash-2",
   "license": "MIT"
