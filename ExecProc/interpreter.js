@@ -52,7 +52,7 @@ module.exports = class Interpreter {
         if (this.varExists(name)) {
             return this.variables[name];
         }
-        throw new Error(`Attempted to GET an uninitialized variable: '${name}' ${this.variables[name]} (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+        throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
     }
     varExists(name) {
         return this.variables[name] == null ? false : true;

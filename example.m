@@ -36,3 +36,13 @@ util.log(-(1)+2); // operations directly in `log`
 util.log(-1); // negative numbers (all numbers are signed)
 
 util.log(9 ^ .5) // exponents!
+
+// we can also access the last set variable:
+let helloWorld = 9*2+3 // should equal: 21
+
+util.log(util.last) // should be 21
+
+let other = helloWorld+1 // 22
+
+util.log(util.last) // 22
+util.log(util.last * 5) // 110
