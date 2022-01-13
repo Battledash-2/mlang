@@ -1,15 +1,21 @@
+const cli = require("cli2json").parse(process.argv.slice(2).join(" "), {
+readCommandAfter: ["-m", "--mode"]
+})
 const fs = require("fs");
 const readline = require("readline");
 
-const mode = process.argv[2];
-const filename  = process.argv[3]; // file or terminal / console
+const mode = cli.flags[0].split(" ").shift() || "-f";
+const filename  = cli.commands[0] || (() => {
+console.log("No file! Exiting");
+process.exit(1);
+})()
 
 const ExecProc = require("./ExecProc");
 
 if (mode == null) {
     console.error("Missing argument 1");
 } else {
-    if (mode.toLowerCase() == "-f") {
+    if (mode.toLowerCase() == "f") {
         if (fs.existsSync(filename)) {
             // console.log(String(fs.readFileSync(filename)));
             const filecontent = String(fs.readFileSync(filename));
@@ -18,7 +24,7 @@ if (mode == null) {
         } else {
             console.error(`File '${filename}' does not exist.`);
         }
-    } else if(mode.toLowerCase() == "-c") {
+    } else if(mode.toLowerCase() == "c") {
         const interface = readline.createInterface({
             input: process.stdin,
             output: process.stdout
