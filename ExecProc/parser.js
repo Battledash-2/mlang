@@ -164,7 +164,7 @@ module.exports = class Parser {
         const vValue = this.operation();
 
         return {
-            type: 'definition',
+            type: 'DEFINITION',
             name: vName.value,
             value: vValue.type == "IDENTIFIER" ? vValue : (vValue.value ? vValue.value : vValue),
             position: {

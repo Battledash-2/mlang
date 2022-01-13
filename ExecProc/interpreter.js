@@ -92,7 +92,7 @@ module.exports = class Interpreter {
     }
 
     loop(node) {
-        if (node?.type == "definition") {
+        if (node?.type == "DEFINITION") {
             this.pos = node;
             if (node.value.left) {
                 this.createVar(this.evaluate(
