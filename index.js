@@ -53,7 +53,7 @@ else {
 mode = "c"
 }
 
-const filename  = process.argv[3]; // file or terminal / console
+const filename  = cli.commands[0] || null;
 
 const ExecProc = require("./ExecProc");
 
