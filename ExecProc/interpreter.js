@@ -66,18 +66,6 @@ module.exports = class Interpreter {
         return r;
     }
 
-    /**
-     * return {
-            type: "FCALL",
-            name: n,
-            arg,
-            position: {
-                line: arg.position.line,
-                cursor: arg.position.cursor
-            }
-        }
-     */
-
     fcall(node) {
         const fname = node.name.value;
         const arg = node.arg != null ? this.loop(node.arg) : node.arg;
@@ -86,9 +74,6 @@ module.exports = class Interpreter {
     }
 
     loop(node) {
-        /**
-         * vValue.type == "IDENTIFIER" ? vValue : (vValue.value ? vValue.value : vValue)
-         */
         if (node?.type == "DEFINITION") {
             this.pos = node;
             if (node.value.left) {
@@ -122,29 +107,8 @@ module.exports = class Interpreter {
             return this.fcall(node);
         }
 
-        /**
-         * return {
-            type: "CONVERT",
-            value: num,
-            from,
-            to
-        }
-         */
-        // if (node?.type == "CONVERT") {
-        //     if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
-        //         return {
-        //             type: "NUMBER",
-        //             value: conversions[`${node.from.value}-${node.to.value}`](this.loop(node?.value?.value)),
-        //             position: node.position
-        //         }
-        //     } else {
-        //         throw new Error(`Unknown unit '${node.from?.value}-${node.to?.value}' or not yet supported (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
-        //     }
-        // }
-
         if (node?.type == "CONVERT") {
             if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
-                // console.log(conversions[`${node.from?.value}-${node.to?.value}`](node.value?.value))
                 return {
                     type: "NUMBER",
                     value: conversions[`${node.from?.value}-${node.to?.value}`](this.loop(node.value)),
@@ -159,13 +123,6 @@ module.exports = class Interpreter {
             this.pos = node;
             return node;
         }
-
-        // if (typeof node == "number") {
-        //     return node;
-        // }
-        // if (typeof node == "string") {
-        //     return this.getVar(node);
-        // }
 
         if (node != null) this.pos = node;
         
