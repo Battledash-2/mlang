@@ -19,7 +19,8 @@ module.exports = class Parser {
             type: "CONVERT",
             value: num,
             from,
-            to
+            to,
+            position: num.position
         }
     }
 
