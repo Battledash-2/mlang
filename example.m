@@ -46,3 +46,23 @@ let other = helloWorld+1 // 22
 
 util.log(util.last) // 22
 util.log(util.last * 5) // 110
+
+// conversion
+util.log(1 => km, mi) // syntax: <num_to_convert> => <from>, <to>
+let myConv = 100 => km, mi // 62
+util.log(myConv) // 62
+util.log(myConv => mi, km) // 100
+
+let m = 5 => mi, m // 8046.7
+util.log(m); // 8046.7
+util.log(m => m, mi) // 4.9999860257
+
+let m2 = 5 => km, m // 5000
+util.log(m2) // 5000
+util.log(m2 => m, km) // 5
+
+// -----------------------------------------
+let c = 40
+let f = c => c, f
+util.log(f) // negative numbers are not supported within conversion operations
+util.log(f => f, c)
