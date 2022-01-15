@@ -1,3 +1,5 @@
+const conversions = require("./core/convert");
+
 const operations = {
     "^": (l, r) => l ** r,
 
@@ -13,15 +15,7 @@ module.exports = class Interpreter {
         this.fn = fn;
         this.fp = fp;
 
-        this.enum = 0;
-
-        this.variables = { // predefine functions an variables here (note: these can be overwritting by the user, although they cannot create functions)
-            "util.pi": Math.PI,
-            "util.enum": (_arg, _pos, caller)=>{return this.createToken("NUMBER", ++this.enum, caller.position);},
-            "util.log": (arg)=>console.log(arg.value),
-            "util.sin": (arg, pos)=>this.createToken("NUMBER", Math.sin(arg.value), pos.position),
-            "util.cosin": (arg, pos)=>this.createToken("NUMBER", Math.cos(arg.value), pos.position)
-        };
+        this.variables = require("./core/main")(this.createToken);
         this.pos;
         
         return this.start(ast.body);
@@ -72,18 +66,6 @@ module.exports = class Interpreter {
         return r;
     }
 
-    /**
-     * return {
-            type: "FCALL",
-            name: n,
-            arg,
-            position: {
-                line: arg.position.line,
-                cursor: arg.position.cursor
-            }
-        }
-     */
-
     fcall(node) {
         const fname = node.name.value;
         const arg = node.arg != null ? this.loop(node.arg) : node.arg;
@@ -105,7 +87,7 @@ module.exports = class Interpreter {
             } else if(node.value.type == "FCALL") {
                 this.createVar(this.loop(this.fcall(node.value))?.value, node.name);
             } else {
-                this.createVar(node.value, node.name);
+                this.createVar(this.loop(node.value).value, node.name);
             }
             return null;
         }
@@ -125,18 +107,25 @@ module.exports = class Interpreter {
             return this.fcall(node);
         }
 
+        if (node?.type == "CONVERT") {
+            if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
+                return {
+                    type: "NUMBER",
+                    value: conversions[`${node.from?.value}-${node.to?.value}`](this.loop(node.value)),
+                    position: node?.position
+                }
+            } else {
+                throw new Error(`Unknown unit '${node.from?.value}-${node.to?.value}' or not yet supported (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+            }
+        }
+
         if (node?.value) {
             this.pos = node;
             return node;
         }
 
-        // if (typeof node == "number") {
-        //     return node;
-        // }
-        // if (typeof node == "string") {
-        //     return this.getVar(node);
-        // }
-
+        if (node != null) this.pos = node;
+        
         return {
             type: node.type,
             value: this.evaluate(

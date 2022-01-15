@@ -3,6 +3,9 @@ const specification = [
 
     [/^\.?\d+\.?\d*/, "NUMBER"],
     [/^[\+\-\/\*\^]/, "OPERATOR"],
+    
+    [/^=>/, "CONVERT"],
+    [/^,/, "SEPERATOR"],
 
     [/^\(/, "LPAREN"],
     [/^\)/, "RPAREN"],
