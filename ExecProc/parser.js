@@ -9,10 +9,26 @@ module.exports = class Parser {
         return this.program();
     }
 
+    convert(num=0) {
+        const from = this.advance("CONVERT");
+        this.advance("IDENTIFIER");
+        const to = this.advance("SEPERATOR");
+        this.advance("IDENTIFIER");
+
+        return {
+            type: "CONVERT",
+            value: num,
+            from,
+            to
+        }
+    }
+
     number() {
         let r = this.next;
         r.value = Number(r.value);
-        this.advance();
+        if (this.advance()?.type == "CONVERT") {
+            return this.convert(r);
+        };
 
         return r;
     }
@@ -39,9 +55,13 @@ module.exports = class Parser {
 
     identifier() {
         let r = this.next;
-        if (this.advance()?.type == "LPAREN") {
+        let a = this.advance();
+        if (a?.type == "LPAREN") {
             return this.fcall(r);
+        } else if (a?.type == "CONVERT") {
+            return this.convert(r);
         }
+
         return r;
     }
 
@@ -159,17 +179,17 @@ module.exports = class Parser {
     variableExpression() {
         if (this.next?.type != "DEFINE") return this.operation();
 
-        const vName  = this.advance("DEFINE");
+        const vName  = this.advance("DEFINE").value;
         this.advance();
         const vValue = this.operation();
 
         return {
             type: 'DEFINITION',
-            name: vName.value,
-            value: vValue.type == "IDENTIFIER" ? vValue : (vValue.value ? vValue.value : vValue),
+            name: vName,
+            value: vValue,
             position: {
-                line: vName.position.line,
-                cursor: vName.position.cursor
+                line: this.next.position.line,
+                cursor: this.next.position.cursor
             }
         }
     }

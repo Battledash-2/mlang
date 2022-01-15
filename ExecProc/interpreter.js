@@ -1,3 +1,5 @@
+const conversions = require("./core/convert");
+
 const operations = {
     "^": (l, r) => l ** r,
 
@@ -13,15 +15,7 @@ module.exports = class Interpreter {
         this.fn = fn;
         this.fp = fp;
 
-        this.enum = 0;
-
-        this.variables = { // predefine functions an variables here (note: these can be overwritting by the user, although they cannot create functions)
-            "util.pi": Math.PI,
-            "util.enum": (_arg, _pos, caller)=>{return this.createToken("NUMBER", ++this.enum, caller.position);},
-            "util.log": (arg)=>console.log(arg.value),
-            "util.sin": (arg, pos)=>this.createToken("NUMBER", Math.sin(arg.value), pos.position),
-            "util.cosin": (arg, pos)=>this.createToken("NUMBER", Math.cos(arg.value), pos.position)
-        };
+        this.variables = require("./core/main")(this.createToken);
         this.pos;
         
         return this.start(ast.body);
@@ -92,6 +86,9 @@ module.exports = class Interpreter {
     }
 
     loop(node) {
+        /**
+         * vValue.type == "IDENTIFIER" ? vValue : (vValue.value ? vValue.value : vValue)
+         */
         if (node?.type == "DEFINITION") {
             this.pos = node;
             if (node.value.left) {
@@ -105,7 +102,7 @@ module.exports = class Interpreter {
             } else if(node.value.type == "FCALL") {
                 this.createVar(this.loop(this.fcall(node.value))?.value, node.name);
             } else {
-                this.createVar(node.value, node.name);
+                this.createVar(this.loop(node.value).value, node.name);
             }
             return null;
         }
@@ -125,6 +122,39 @@ module.exports = class Interpreter {
             return this.fcall(node);
         }
 
+        /**
+         * return {
+            type: "CONVERT",
+            value: num,
+            from,
+            to
+        }
+         */
+        // if (node?.type == "CONVERT") {
+        //     if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
+        //         return {
+        //             type: "NUMBER",
+        //             value: conversions[`${node.from.value}-${node.to.value}`](this.loop(node?.value?.value)),
+        //             position: node.position
+        //         }
+        //     } else {
+        //         throw new Error(`Unknown unit '${node.from?.value}-${node.to?.value}' or not yet supported (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
+        //     }
+        // }
+
+        if (node?.type == "CONVERT") {
+            if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
+                // console.log(conversions[`${node.from?.value}-${node.to?.value}`](node.value?.value))
+                return {
+                    type: "NUMBER",
+                    value: conversions[`${node.from?.value}-${node.to?.value}`](this.loop(node.value)),
+                    position: node?.position
+                }
+            } else {
+                throw new Error(`Unknown unit '${node.from?.value}-${node.to?.value}' or not yet supported (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+            }
+        }
+
         if (node?.value) {
             this.pos = node;
             return node;
@@ -137,6 +167,8 @@ module.exports = class Interpreter {
         //     return this.getVar(node);
         // }
 
+        if (node != null) this.pos = node;
+        
         return {
             type: node.type,
             value: this.evaluate(
