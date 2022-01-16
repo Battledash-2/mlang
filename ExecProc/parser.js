@@ -195,10 +195,11 @@ module.exports = class Parser {
         }
     }
 
-    program() {
+    program(stopAtKey="") {
         const body = [];
         while(true) {
             if (this.next == null) break;
+            if (stopAtKey != "" && this.next.type == stopAtKey) break;
             const adv = this.variableExpression();
             body.push(adv);
         }
