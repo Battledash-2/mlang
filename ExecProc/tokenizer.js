@@ -1,22 +1,22 @@
 const specification = [
     [/^\/\/[^\n]*/, null], // this needs to have a higher precedence
 
-    [/^\.?\d+\.?\d*/, "NUMBER"],
-    [/^[\+\-\/\*\^]/, "OPERATOR"],
+    [/^\.?\d+\.?\d*/, "NUMBER"], // for digits and numbers
+    [/^[\+\-\/\*\^]/, "OPERATOR"], // operators
     
-    [/^=>/, "CONVERT"],
-    [/^,/, "SEPERATOR"],
+    [/^=>/, "CONVERT"], // conversion operators (100 => km, mi)
+    [/^,/, "SEPERATOR"], // seperates (km, mi)
 
-    [/^\(/, "LPAREN"],
-    [/^\)/, "RPAREN"],
+    [/^\(/, "LPAREN"], // opening parentheses (for functions and math)
+    [/^\)/, "RPAREN"], // closing parentheses (for functions and math)
 
-    [/^\b(var|let)\b/, "DEFINE"],
-    [/^\b[a-zA-Z](\w|\.)*\b/, "IDENTIFIER"],
+    [/^\b(var|let)\b/, "DEFINE"], // variable definition keywords (there is no such thing as a constant, nor a scope)
+    [/^\b[a-zA-Z](\w|\.)*\b/, "IDENTIFIER"], // identifiers like variable names and referencing variables (also in use for conversions)
 
-    [/^=/, null],
-    [/^\n/, "NL"],
-    [/^\s/, null],
-    [/^;/, null]
+    [/^=/, null], // '=' in case someone uses (let a **=** 58) this also means you can do (let a 58)
+    [/^\n/, "NL"], // new line for error messaging
+    [/^\s/, null], // whitespace 
+    [/^;/, null] // semi-colons
 ]
 
 module.exports = class Tokenizer {
