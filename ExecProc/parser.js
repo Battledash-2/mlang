@@ -185,7 +185,7 @@ module.exports = class Parser {
         const vValue = this.operation();
 
         return {
-            type: 'DEFINITION',
+            type: "DEFINITION",
             name: vName,
             value: vValue,
             position: {
@@ -195,11 +195,10 @@ module.exports = class Parser {
         }
     }
 
-    program(stopAtKey="") {
+    program() {
         const body = [];
         while(true) {
             if (this.next == null) break;
-            if (stopAtKey != "" && this.next.type == stopAtKey) break;
             const adv = this.variableExpression();
             body.push(adv);
         }
