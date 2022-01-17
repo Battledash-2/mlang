@@ -42,7 +42,7 @@ Copyright (c) 2022 Battledash-2 (& MLang)
                 }
 
                 const result = new ExecProc(response, "runtime", "runtime");
-                console.log(result[0] == null ? undefined : (result[0]?.type == "STRING" ? `\u001b[92m"${result[0].value}"\u001b[0m` : result[0]?.value));
+                console.log(result[0] == null ? "\u001b[1;35mundefined\u001b[0m" : (result[0]?.type == "STRING" ? `\u001b[92m"${result[0].value}"\u001b[0m` : result[0]?.value));
 
                 ask();
             });
