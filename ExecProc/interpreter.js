@@ -69,6 +69,16 @@ module.exports = class Interpreter {
         this.variables[name] = value;
     }
 
+    execConvert(fname, arg) {
+        if (this.userConversions[fname]) {
+            this.createVar(arg?.value, "util.arg");
+            const result = this.start(this.userConversions[fname])[0] || null;
+            this.deleteVar("util.arg", false);
+            return result;
+        }
+        throw new Error(`Attempted to GET an uninitialized function: '${fname}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+    }
+
     start(node) {
         let r = [];
         for (let o in node) {
