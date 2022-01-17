@@ -168,6 +168,24 @@ module.exports = class Interpreter {
             return null;
         }
 
+        /*
+        type: "UNARY",
+            value: Number(num.value),
+            operator: op.value,
+            position: {
+                cursor: op.position.cursor,
+                line: op.position.line
+            }
+            */
+        if (node?.type == "UNARY") {
+            this.pos = node;
+            return {
+                type: "NUMBER",
+                value: Number(node?.operator + this.loop(node?.value).value),
+                position: node?.position
+            };
+        }
+
         if (node?.value) {
             this.pos = node;
             return node;

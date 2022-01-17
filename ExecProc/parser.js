@@ -158,8 +158,9 @@ module.exports = class Parser {
         }
 
         if (op != null) return {
-            type: "NUMBER",
-            value: Number(op.value + String(num.value)),
+            type: "UNARY",
+            value: num,
+            operator: op.value,
             position: {
                 cursor: op.position.cursor,
                 line: op.position.line
@@ -251,8 +252,8 @@ module.exports = class Parser {
             name: vName,
             value: vValue,
             position: {
-                line: this.next.position.line,
-                cursor: this.next.position.cursor
+                line: this.next?.position.line,
+                cursor: this.next?.position.cursor
             }
         }
     }
