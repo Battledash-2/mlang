@@ -82,7 +82,7 @@ module.exports = class Interpreter {
         if (this.userFunctions[fname]) {
             this.createVar(arg?.value, "util.arg");
             const result = this.start(this.userFunctions[fname])[0] || null;
-            this.deleteVar("util.arg");
+            this.deleteVar("util.arg", false);
             return result;
         }
         throw new Error(`Attempted to GET an uninitialized function: '${fname}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
