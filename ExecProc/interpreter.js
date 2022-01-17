@@ -16,6 +16,7 @@ module.exports = class Interpreter {
         this.fp = fp;
 
         this.variables = require("./core/main")(this.createToken);
+        this.userFunctions = {}; // functions defined by user
         this.pos;
         
         return this.start(ast.body);
@@ -42,11 +43,18 @@ module.exports = class Interpreter {
         }
     }
 
-    getVar(name) {
+    getVar(name, withError=true) {
         if (this.varExists(name)) {
             return this.variables[name];
         }
-        throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+        if (withError) throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+    }
+    deleteVar(name, withError=true) {
+        if (this.varExists(name)) {
+            delete this.variables[name];
+            return null;
+        }
+        if (withError) throw new Error(`Attempted to DELETE an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
     }
     varExists(name) {
         return this.variables[name] == null ? false : true;
@@ -66,11 +74,25 @@ module.exports = class Interpreter {
         return r;
     }
 
+    execFunc(fname, arg) {
+        if (this.userFunctions[fname]) {
+            this.createVar(arg?.value, "util.arg");
+            const result = this.start(this.userFunctions[fname])[0] || null;
+            this.deleteVar("util.arg");
+            return result;
+        }
+        throw new Error(`Attempted to GET an uninitialized function: '${fname}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+    }
+
     fcall(node) {
         const fname = node.name.value;
         const arg = node.arg != null ? this.loop(node.arg) : node.arg;
 
-        return this.getVar(fname)(arg, node.arg, node);
+        if (typeof this.getVar(fname, false) == "function") {
+            return this.getVar(fname)(arg, node.arg, node);
+        } else {
+            return this.execFunc(fname, arg, node.arg, node);
+        }
     }
 
     loop(node) {
@@ -117,6 +139,14 @@ module.exports = class Interpreter {
             } else {
                 throw new Error(`Unknown unit '${node.from?.value}-${node.to?.value}' or not yet supported (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
             }
+        }
+
+        if (node?.type == "DEFINEF") { // this.userFunctions
+            const fname = node?.name?.value;
+            const fbody = node?.body?.body;
+            this.userFunctions[fname] = fbody;
+            
+            return null;
         }
 
         if (node?.value) {

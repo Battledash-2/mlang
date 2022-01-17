@@ -8,6 +8,6 @@ module.exports = class ExecProc {
         const ast    = new Parser(tokens, filename, absolutePath);
         return         new Interpreter(ast, filename, absolutePath);
 
-        return         ast;
+        // return         ast;
     }
 };

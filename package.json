@@ -1,11 +1,11 @@
 {
   "name": "mlang",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "M Lang - The Arithmetic Language: M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, built-in functions and expressions.",
   "main": "index.js",
   "scripts": {
     "example": "node . -f example.m",
-    "test": "node . -f ./tests/conversion.m",
+    "test": "node . -f ./tests/functions.m",
     "start": "node . -c"
   },
   "keywords": ["nodejs", "interpreter", "language", "parser", "lexer", "tokenizer"],

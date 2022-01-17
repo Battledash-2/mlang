@@ -10,8 +10,14 @@ const specification = [
     [/^\(/, "LPAREN"], // opening parentheses (for functions and math)
     [/^\)/, "RPAREN"], // closing parentheses (for functions and math)
 
+    [/^\bfunc\b/, "DEFINEF"], // functions definition keyword
+    [/^{/, "BOPEN"], // block open 
+    [/^}/, "BCLOSE"], // block close
+
     [/^\b(var|let)\b/, "DEFINE"], // variable definition keywords (there is no such thing as a constant, nor a scope)
-    [/^\b[a-zA-Z](\w|\.)*\b/, "IDENTIFIER"], // identifiers like variable names and referencing variables (also in use for conversions)
+    [/^\b[a-zA-Z_](\w|\.)*\b/, "IDENTIFIER"], // identifiers like variable names and referencing variables (also in use for conversions)
+
+    [/^("|')((?:\\\1|(?:(?!\1).))*)\1/, "STRING"],
 
     [/^=/, null], // '=' in case someone uses (let a **=** 58) this also means you can do (let a 58)
     [/^\n/, "NL"], // new line for error messaging

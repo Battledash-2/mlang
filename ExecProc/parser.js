@@ -9,6 +9,37 @@ module.exports = class Parser {
         return this.program();
     }
 
+    /*
+        [/^\bfunc\b/, "DEFINEF"], // functions definition keyword
+        [/^{/, "BOPEN"], // block open 
+        [/^}/, "BCLOSE"], // block close
+    */
+    block() {
+        const body = [];
+        this.advance("BOPEN");
+        while(this.next.type != "BCLOSE") {
+            const adv = this.variableExpression();
+            body.push(adv);
+        }
+        this.advance("BCLOSE");
+        return {
+            type: 'BLOCK',
+            body
+        }
+    }
+
+    functionDefinition() {
+        const fname = this.advance("DEFINEF");
+        this.advance("IDENTIFIER");
+        const body = this.block();
+
+        return {
+            type: "DEFINEF",
+            name: fname,
+            body
+        }
+    }
+
     convert(num=0) {
         const from = this.advance("CONVERT");
         this.advance("IDENTIFIER");
@@ -22,6 +53,16 @@ module.exports = class Parser {
             to,
             position: num.position
         }
+    }
+
+    string() {
+        const result = {
+            type: "STRING",
+            value: this.next.value.slice(1, -1),
+            position: this.next.position
+        }
+        this.advance("STRING");
+        return result;
     }
 
     number() {
@@ -81,6 +122,10 @@ module.exports = class Parser {
                 return this.parentheses();
             case "IDENTIFIER":
                 return this.identifier();
+            case "DEFINEF":
+                return this.functionDefinition();
+            case "STRING":
+                return this.string();
             default:
                 return this.number();
         }
