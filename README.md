@@ -10,7 +10,7 @@
 - [ ] Javascript API (Priority: unknown)
 
 ## Done
-- [x] Multi-line comments
+- [x] Multi-line comments (Priority: extremely low)
 - [x] Import files (Priority: unknown)
 - [x] Minimal string support (Priority: unknown)
 - [x] Functions (Priority: Medium)
