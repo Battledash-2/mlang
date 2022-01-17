@@ -134,9 +134,9 @@ module.exports = class Interpreter {
         }
 
         if (node?.type == "CONVERT") {
-			if (this.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)){
+	    if (this.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)){
                 return this.execConvert(`${node.from?.value}-${node.to?.value}`, this.loop(node.value))
-			} else if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
+	    } else if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
                 return {
                     type: "NUMBER",
                     value: conversions[`${node.from?.value}-${node.to?.value}`](this.loop(node.value)),
@@ -160,9 +160,9 @@ module.exports = class Interpreter {
 
         if (node?.type == "DEFINEC") { // this.userFunctions
             var fname = node?.name;
-			var fname = fname[0]?.value+'-'+fname[1]?.value
+	    var fname = fname[0]?.value+'-'+fname[1]?.value
             const fbody = node?.body?.body;
-			this.userConversions[fname] = fbody
+	    this.userConversions[fname] = fbody
 
             return null;
         }
