@@ -145,6 +145,7 @@ module.exports = class Interpreter {
         }
 
         if (node?.type == "CONVERT") {
+	    this.pos = node;
 	    if (this.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)){
                 return this.execConvert(`${node.from?.value}-${node.to?.value}`, this.loop(node.value))
 	    } else if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
