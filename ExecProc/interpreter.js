@@ -14,6 +14,22 @@ const operations = {
     "-": (l, r) => l - r
 }
 
+const binOperations = {
+    "==": (l, r) => l == r,
+    "===": (l, r) => l === r,
+
+    "!=": (l, r) => l != r,
+    "!==": (l, r) => l !== r,
+
+    "&&": (l, r) => l && r,
+    "||": (l, r) => l || r,
+
+    ">=": (l, r) => l >= r,
+    "<=": (l, r) => l <= r,
+    ">": (l, r) => l > r,
+    "<": (l, r) => l < r
+}
+
 module.exports = class Interpreter {
     constructor(ast, fn, fp) {
         this.fn = fn;
@@ -33,20 +49,7 @@ module.exports = class Interpreter {
             value,
             position
         }
-    }
-
-    evaluate({ value: l }, { value: r }, operator) {
-        if (operator != null) {
-            if (l.type == "IDENTIFIER") {
-                l = this.getVar(l.value);
-            }
-            if (r.type == "IDENTIFIER") {
-                r = this.getVar(r.value);
-            }
-
-            return operations[operator](l, r);
-        }
-    }
+    }h
 
     getVar(name, withError=true) {
         if (this.varExists(name)) {
@@ -102,7 +105,7 @@ module.exports = class Interpreter {
     fcall(node) {
         const fname = node.name.value;
         const arg = node.arg != null ? this.loop(node.arg) : node.arg;
-
+        
         if (typeof this.getVar(fname, false) == "function") {
             return this.getVar(fname)(arg, node.arg, node);
         } else {
@@ -110,7 +113,23 @@ module.exports = class Interpreter {
         }
     }
 
-    loop(node) {
+    evaluate({ value: l }, { value: r }, operator, eou=true) {
+        if (operator != null) {
+            if (l.type == "IDENTIFIER") {
+                l = this.getVar(l.value, eou);
+            }
+            if (r?.type == "IDENTIFIER") {
+                r = this.getVar(r.value, eou);
+            }
+
+            if (operations[operator]) return operations[operator](l, r);
+            if (binOperations[operator]) return binOperations[operator](l, r);
+
+            throw new Error(`Could not find operator '${operator}' internally (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
+        }
+    }
+
+    loop(node, errorOnUndefined=true) {
         if (node?.type == "DEFINITION") {
             this.pos = node;
             if (node.value.left) {
@@ -130,11 +149,10 @@ module.exports = class Interpreter {
         }
     
         if (node?.type == "IDENTIFIER") {
-            // console.log("A", node?.type, node)
             this.pos = node;
             return {
                 type: node.type,
-                value: this.getVar(node.value),
+                value: this.getVar(node.value, errorOnUndefined),
                 position: node.position
             }
         }
@@ -147,7 +165,7 @@ module.exports = class Interpreter {
         if (node?.type == "CONVERT") {
             this.pos = node;
             if (this.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)){
-                    return this.execConvert(`${node.from?.value}-${node.to?.value}`, this.loop(node.value))
+                return this.execConvert(`${node.from?.value}-${node.to?.value}`, this.loop(node.value))
             } else if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
                 return {
                     type: "NUMBER",
@@ -191,25 +209,34 @@ module.exports = class Interpreter {
             return null;
         }
 
-        /*
-        type: "UNARY",
-            value: Number(num.value),
-            operator: op.value,
-            position: {
-                cursor: op.position.cursor,
-                line: op.position.line
-            }
-            */
         if (node?.type == "UNARY") {
             this.pos = node;
+
             return {
                 type: "NUMBER",
-                value: Number(node?.operator + this.loop(node?.value).value),
+                value: Number(node?.operator + Math.abs(this.loop(node?.value).value)),
                 position: node?.position
             };
         }
 
-        if (node?.value) {
+        if (node?.type == "CONDITION") {
+            if (node?.condition?.left) {
+                if (this.evaluate(this.loop(node?.condition?.left, false), this.loop(node?.condition?.right, false), node?.condition?.operator, false)) {
+                    return this.start(node?.pass?.body)[0] || null;
+                } else if (node?.fail?.body != null) {
+                    return this.start(node?.fail?.body)[0] || null;
+                }
+            } else {
+                if (this.varExists(node?.condition?.value) || node?.condition?.value > 0 || node?.condition?.value == "true") {
+                    return this.start(node?.pass?.body)[0] || null;
+                } else if (node?.fail?.body != null) {
+                    return this.start(node?.fail?.body)[0] || null;
+                }
+            }
+            return null;
+        }
+
+        if (node?.value != null) {
             this.pos = node;
             return node;
         }
@@ -219,9 +246,10 @@ module.exports = class Interpreter {
         return {
             type: node.type,
             value: this.evaluate(
-                this.loop(node.left),
-                this.loop(node.right),
-                node.operator // this could be `null`
+                this.loop(node.left, errorOnUndefined),
+                this.loop(node.right, errorOnUndefined),
+                node.operator, // this could be `null`
+                errorOnUndefined
             ),
             position: node.position
         }

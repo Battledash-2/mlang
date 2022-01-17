@@ -141,6 +141,50 @@ module.exports = class Parser {
         }
     }
 
+    // condition() { // CONDITION
+    //     this.advance("LPAREN");
+
+    //     let operator, right;
+        
+    //     let left = this.primary();
+    //     if (this.next.type == "CONDITION") {
+    //         operator = this.next;
+    //         this.advance();
+    //         right = this.primary();
+    //     }
+
+    //     this.advance("RPAREN");
+
+    //     return {
+    //         type: "CONDITION",
+    //         operator: operator?.value,
+    //         left,
+    //         right
+    //     }
+    // }
+    
+    conditional() {
+        let pass, fail;
+
+        this.advance("CONDITIONAL");
+        this.advance("LPAREN");
+        const condition = this.condition();
+        this.advance("RPAREN");
+
+        pass = this.block();
+
+        if (this.next?.type == "CONDITIONAL_ELSE" && this.advance()) {
+            fail = this.block();
+        }
+
+        return {
+            type: "CONDITION",
+            condition,
+            pass,
+            fail
+        }
+    }
+
     primary() {
         switch (this.next?.type) {
             case "DEFINE":
@@ -159,6 +203,8 @@ module.exports = class Parser {
                 return this.number();
             case "IMPORT":
                 return this.import();
+            case "CONDITIONAL": // CONDITIONAL_ELSE
+                return this.conditional();
             default:
                 const r = this.next;
                 this.advance();
@@ -186,6 +232,28 @@ module.exports = class Parser {
         }
 
         return this.primary();
+    }
+
+    condition() {
+        let left = this.unary();
+        let position = left.position;
+
+        while (this.next?.type == "CONDITION" && this.tokens.isOperation(this.next)) {
+            const operator = this.next.value;
+            this.advance("CONDITION");
+            const right = this.unary();
+
+            left = {
+                operator,
+                left,
+                right
+            }
+        }
+
+        return {
+            ...left,
+            position
+        };
     }
 
     exponent() {

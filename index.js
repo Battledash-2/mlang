@@ -33,7 +33,7 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
         }
 
         function ask() {
-            interface.question("\u001b[97mmlang \u001b[1;31m$ \u001b[0m", (response)=>{
+            interface.question("\u001b[1;97mmlang \u001b[1;31m$ \u001b[0m", (response)=>{
                 if (isExit(response)) {
                     interface.close();
                     console.log("\033c"); // clears console
@@ -41,7 +41,7 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
                 }
 
                 const result = new ExecProc(response, "runtime", "runtime");
-                console.log(result[0] == null ? "\u001b[1;35mundefined\u001b[0m" : (result[0]?.type == "STRING" ? `\u001b[92m"${result[0].value}"\u001b[0m` : result[0]?.value));
+                console.log(result[0] == null ? "\u001b[1;35mundefined\u001b[0m" : (result[0]?.type == "STRING" ? `\u001b[92m"${result[0].value}"\u001b[0m` : (result[0]?.type == "BOOLEAN" ? "\u001b[1;91m" + result[0]?.value + "\u001b[0m" : result[0].value)));
 
                 ask();
             });
