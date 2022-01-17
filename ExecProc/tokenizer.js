@@ -11,6 +11,7 @@ const specification = [
     [/^\)/, "RPAREN"], // closing parentheses (for functions and math)
 
     [/^\bfunc\b/, "DEFINEF"], // functions definition keyword
+	[/^\b(convert|conversion)\b/, "DEFINEC"], // define conversion
     [/^{/, "BOPEN"], // block open 
     [/^}/, "BCLOSE"], // block close
 
