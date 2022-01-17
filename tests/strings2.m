@@ -1,0 +1,1 @@
+util.log('hello\'s \\')

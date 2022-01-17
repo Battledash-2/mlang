@@ -58,7 +58,7 @@ module.exports = class Parser {
     string() {
         const result = {
             type: "STRING",
-            value: this.next.value.slice(1, -1),
+            value: this.next.value.slice(1, -1).replace(/\\("|')/g, "$1").replace(/\\/g, "\\"), // there isn't actual support for escapes
             position: this.next.position
         }
         this.advance("STRING");
