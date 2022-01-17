@@ -30,7 +30,7 @@ if (mode == null) {
         }
 
         function ask() {
-            interface.question("calculate > ", (response)=>{
+            interface.question("\u001b[97mMLang \u001b[1;34m$ \u001b[0m", (response)=>{
                 if (isExit(response)) {
                     interface.close();
                     console.log("\033c"); // clears console
