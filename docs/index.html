@@ -1,0 +1,45 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<div id="screen">$&gt;<input></div>
+
+<!-- This is the output area -->
+<div id="output"></div>
+<script>
+  var $out = $("#output");
+
+  $("#screen input").focus();
+  $("#screen input").on('keyup', function(event) {
+
+    if(event.which === 13) {
+      // Enter key pressed
+      var $this = $(this);
+      var val = $this.val();
+      
+      if(val === "hello world") {
+        $out.append(">> Hello Galaxy<br>");
+      }
+      
+      $this.val('');
+    }
+  });
+</script>
+<style>
+body {
+  font-family:"courier new", monospaced;
+  border-radius:5px;
+  border:2px solid black;
+  height:60vh;
+  background-color:rgba(200,200,200, .5);
+  padding:10px;
+}
+
+input { 
+  background-color:rgb(0, 150, 0);
+  color: #ff0;
+  font-weight:bold;
+  letter-spacing:.2em;
+}
+#output { 
+  color:#000; 
+  background-color:rgba(200,200,200, .25);
+}
+</style>
