@@ -24,7 +24,7 @@ const specification = [
     [/^=/, null], // '=' in case someone uses (let a **=** 58) this also means you can do (let a 58)
     [/^\n/, "NL"], // new line for error messaging
     [/^\s/, null], // whitespace 
-    [/^;/, "LE"] // semi-colons
+    [/^;/, null] // semi-colons
 ]
 
 module.exports = class Tokenizer {
@@ -82,8 +82,6 @@ module.exports = class Tokenizer {
                     this.line++;
                     
                     return this.nextToken();
-                case "LE":
-                    return this.nextToken(); // for future compat
             }
 
             return {
