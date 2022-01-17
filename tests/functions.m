@@ -5,3 +5,8 @@ func hello {
 }
 
 util.log(hello(1)+1)
+
+func hourToMinute {
+    util.arg*60
+}
+util.log(hourToMinute(1))
