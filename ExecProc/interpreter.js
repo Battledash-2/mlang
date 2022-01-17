@@ -21,6 +21,7 @@ module.exports = class Interpreter {
 
         this.variables = require("./core/main")(this.createToken);
         this.userFunctions = {}; // functions defined by user
+	this.userConversions = {};
         this.pos;
         
         return this.start(ast.body);
