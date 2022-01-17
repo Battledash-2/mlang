@@ -94,6 +94,6 @@ module.exports = class Tokenizer {
             };
         }
 
-        throw new Error(`Unexpected token '${string.slice(0, 1)}' at ${this.fn}:${this.line}:${this.pos}`)
+        throw new Error(`Unexpected token '${string.slice(0, 1)}' at ${this.fn}:${this.line+1}:${this.pos+1}`)
     }
 }
