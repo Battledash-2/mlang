@@ -163,7 +163,7 @@ module.exports = class Interpreter {
                 const parsed = new Parser(new Tokenizer(String(fileContent), node?.file, node?.file), node?.file, node?.file);
                 this.start(parsed.body);
             } else {
-                throw new Error(`Attempt to import a non-existing file '${node?.file}' (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
+                throw new Error(`Attempt to import a non-existent file '${node?.file}' (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
             }
             return null;
         }
