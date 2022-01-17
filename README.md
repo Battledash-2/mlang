@@ -10,6 +10,7 @@
 Nothing here..
 
 ## Done
+- [x] Import files (Priority unknown)
 - [x] Minimal string support (Priority unknown)
 - [x] Functions (Priority Medium)
 - [x] Unit Conversion (Priority unknown)

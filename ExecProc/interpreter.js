@@ -1,3 +1,7 @@
+const fs = require("fs");
+const Tokenizer = require("./tokenizer");
+const Parser    = require("./parser");
+
 const conversions = require("./core/convert");
 
 const operations = {
@@ -146,6 +150,18 @@ module.exports = class Interpreter {
             const fbody = node?.body?.body;
             this.userFunctions[fname] = fbody;
             
+            return null;
+        }
+
+        if (node?.type == "IMPORT") {
+            this.pos = node;
+            if (fs.existsSync(node?.file)) {
+                const fileContent = fs.readFileSync(node?.file);
+                const parsed = new Parser(new Tokenizer(String(fileContent), node?.file, node?.file), node?.file, node?.file);
+                this.start(parsed.body);
+            } else {
+                throw new Error(`Attempt to import a non-existing file '${node?.file}' (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
+            }
             return null;
         }
 

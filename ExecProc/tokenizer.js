@@ -14,6 +14,8 @@ const specification = [
     [/^{/, "BOPEN"], // block open 
     [/^}/, "BCLOSE"], // block close
 
+    [/^\bimport\b/, "IMPORT"],
+
     [/^\b(var|let)\b/, "DEFINE"], // variable definition keywords (there is no such thing as a constant, nor a scope)
     [/^\b[a-zA-Z_](\w|\.)*\b/, "IDENTIFIER"], // identifiers like variable names and referencing variables (also in use for conversions)
 

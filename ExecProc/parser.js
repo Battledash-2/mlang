@@ -114,6 +114,17 @@ module.exports = class Parser {
         return r;
     }
 
+    import() {
+        const position = this.next.position;
+        const importFile = this.advance("IMPORT");
+        this.advance("STRING");
+        return {
+            type: "IMPORT",
+            file: importFile.value.slice(1, -1),
+            position
+        }
+    }
+
     primary() {
         switch (this.next?.type) {
             case "DEFINE":
@@ -126,8 +137,14 @@ module.exports = class Parser {
                 return this.functionDefinition();
             case "STRING":
                 return this.string();
-            default:
+            case "NUMBER":
                 return this.number();
+            case "IMPORT":
+                return this.import();
+            default:
+                const r = this.next;
+                this.advance();
+                return r;
         }
     }
 
