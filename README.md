@@ -7,7 +7,9 @@
 - Thinking...
 
 ## To-Do
-- [ ] Javascript API (Priority: unknown)
+- [ ] Arrays (Priority: HIGH)
+- [ ] Conditional statements (Priority: HIGH)
+- [ ] Javascript API (Priority: extremely low / not expected soon)
 
 ## Done
 - [x] Multi-line comments (Priority: extremely low)
