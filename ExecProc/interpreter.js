@@ -134,6 +134,7 @@ module.exports = class Interpreter {
         }
 
         if (node?.type == "CONVERT") {
+            this.pos = node;
             if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
                 return {
                     type: "NUMBER",
@@ -146,6 +147,8 @@ module.exports = class Interpreter {
         }
 
         if (node?.type == "DEFINEF") { // this.userFunctions
+            this.pos = node;
+
             const fname = node?.name?.value;
             const fbody = node?.body?.body;
             this.userFunctions[fname] = fbody;
