@@ -38,7 +38,7 @@ if (mode == null) {
                 }
 
                 const result = new ExecProc(response, "runtime", "runtime");
-                console.log("Result execution process: "+JSON.stringify(result, null, 4));
+                console.log(result[0] == null ? undefined : (result[0]?.type == "STRING" ? `\u001b[92m"${result[0].value}"\u001b[0m` : result[0]?.value));
 
                 ask();
             });
