@@ -1,7 +1,5 @@
-convert hello, world {
-    "Hello" + util.arg
+convert welcome, them {
+    "Welcome, " + util.arg + "!"
 }
-func hello {
-    util.log(util.arg)
-}
-hello("hi" => hello, world)
+
+util.log("Dora the Explorer" => welcome, them)
