@@ -21,6 +21,7 @@ module.exports = class Interpreter {
 
         this.variables = require("./core/main")(this.createToken);
         this.userFunctions = {}; // functions defined by user
+	this.userConversions = {};
         this.pos;
         
         return this.start(ast.body);
@@ -66,6 +67,16 @@ module.exports = class Interpreter {
     createVar(value, name) {
         this.variables["util.last"] = value;
         this.variables[name] = value;
+    }
+
+    execConvert(fname, arg) {
+        if (this.userConversions[fname]) {
+            this.createVar(arg?.value, "util.arg");
+            const result = this.start(this.userConversions[fname])[0] || null;
+            this.deleteVar("util.arg", false);
+            return result;
+        }
+        throw new Error(`Attempted to GET an uninitialized function: '${fname}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
     }
 
     start(node) {
@@ -134,8 +145,10 @@ module.exports = class Interpreter {
         }
 
         if (node?.type == "CONVERT") {
-            this.pos = node;
-            if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
+	    this.pos = node;
+	    if (this.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)){
+                return this.execConvert(`${node.from?.value}-${node.to?.value}`, this.loop(node.value))
+	    } else if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
                 return {
                     type: "NUMBER",
                     value: conversions[`${node.from?.value}-${node.to?.value}`](this.loop(node.value)),
@@ -145,6 +158,7 @@ module.exports = class Interpreter {
                 throw new Error(`Unknown unit '${node.from?.value}-${node.to?.value}' or not yet supported (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
             }
         }
+
 
         if (node?.type == "DEFINEF") { // this.userFunctions
             this.pos = node;
@@ -156,6 +170,15 @@ module.exports = class Interpreter {
             return null;
         }
 
+        if (node?.type == "DEFINEC") { // this.userFunctions
+            var fname = node?.name;
+	    var fname = fname[0]?.value+'-'+fname[1]?.value
+            const fbody = node?.body?.body;
+	    this.userConversions[fname] = fbody
+
+            return null;
+        }
+        
         if (node?.type == "IMPORT") {
             this.pos = node;
             if (fs.existsSync(node?.file)) {

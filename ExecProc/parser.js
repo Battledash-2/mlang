@@ -39,7 +39,21 @@ module.exports = class Parser {
             body
         }
     }
+    
+    convertDefinition() {
+        const fname = this.advance("DEFINEC");
+        this.advance("IDENTIFIER");
+        const fname2 = this.advance("SEPERATOR");
+        this.advance("IDENTIFIER");
+        const body = this.block();
 
+        return {
+            type: "DEFINEC",
+            name: [fname, fname2],
+            body
+        }
+    }
+    
     convert(num=0) {
         const from = this.advance("CONVERT");
         this.advance("IDENTIFIER");
@@ -135,6 +149,8 @@ module.exports = class Parser {
                 return this.identifier();
             case "DEFINEF":
                 return this.functionDefinition();
+ 			case "DEFINEC":
+				return this.convertDefinition();
             case "STRING":
                 return this.string();
             case "NUMBER":
