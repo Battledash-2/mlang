@@ -8,6 +8,9 @@
     "test": "node . -f ./tests/functions.m",
     "start": "node . -c"
   },
+  "repository": {
+      "url": "https://github.com/Battledash-2/mlang"
+  },
   "keywords": ["nodejs", "interpreter", "language", "parser", "lexer", "tokenizer"],
   "author": "Battledash-2",
   "license": "MIT"
