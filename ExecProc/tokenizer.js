@@ -1,5 +1,5 @@
 const specification = [
-    [/^\/\/[^\n]*/, null], // this needs to have a higher precedence
+    [/^\/\/[^\n]*|^\/\*[\s\S]+?\*\//, "CMNT"], // this needs to have a higher precedence
 
     [/^\.?\d+\.?\d*/, "NUMBER"], // for digits and numbers
     [/^[\+\-\/\*\^]/, "OPERATOR"], // operators
@@ -82,6 +82,16 @@ module.exports = class Tokenizer {
                     this.pos = 0;
                     this.line++;
                     
+                    return this.nextToken();
+                case "CMNT":
+                    // const newlines = this.match(/\n+/g, match);
+                    // this.line += newlines?.length+1;
+                    // if (newlines?.length > 0) this.pos = 0;
+                    // console.log(newlines, 'n', newlines?.length);
+                    // return this.nextToken();
+                    let to = match.indexOf("*/") > -1 ? match.indexOf("*/") : 0;
+                    this.line += this.match(/\n+/g, match.slice(0, to))?.length || 0;
+                    this.pos = 0;
                     return this.nextToken();
             }
 
