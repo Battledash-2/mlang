@@ -45,7 +45,6 @@ module.exports = class Parser {
         this.advance("IDENTIFIER");
         const fname2 = this.advance("SEPERATOR");
         this.advance("IDENTIFIER");
-        console.log(fname, fname2)
         const body = this.block();
 
         return {
