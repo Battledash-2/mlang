@@ -20,7 +20,7 @@ if (mode == null) {
         }
     } else if(mode.toLowerCase() == "-c") {
         console.log(`MLang v${require("./package.json").version}
-Copyright (c) 2022 Battledash-2 (& MLang)`);
+Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 
         const interface = readline.createInterface({
             input: process.stdin,
