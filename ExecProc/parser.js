@@ -75,7 +75,9 @@ module.exports = class Parser {
             value: this.next.value.slice(1, -1).replace(/\\("|')/g, "$1").replace(/\\\\/g, "\\").replace(/\\n/, "\n"), // there isn't actual support for escapes
             position: this.next.position
         }
-        this.advance("STRING");
+        if (this.advance("STRING")?.type == "CONVERT") {
+            return this.convert(result);
+        };
         return result;
     }
 
