@@ -7,9 +7,10 @@
 - Adding features to add support for functions.
 
 ## To-Do
-- [ ] Functions (Priority Medium)
+Nothing here..
 
 ## Done
+- [x] Functions (Priority Medium)
 - [x] Unit Conversion (Priority unknown)
 - [x] Expressions (Priority HIGH)
 - [x] Variables (Priority Medium)
