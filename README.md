@@ -14,6 +14,7 @@
 - [ ] Javascript API (Priority: extremely low / not expected soon)
 
 ## Done
+- [x] Pseudo-pointers / Reference to `$pid` (passed in variable to a function) and `$last` (last variable set) (Priority: unexpected)
 - [x] Conditional statements (Priority: HIGH)
 - [x] Multi-line comments (Priority: extremely low)
 - [x] Import files (Priority: unknown)

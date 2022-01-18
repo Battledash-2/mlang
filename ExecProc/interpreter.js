@@ -37,7 +37,7 @@ module.exports = class Interpreter {
 
         this.variables = require("./core/main")(this.createToken);
         this.userFunctions = {}; // functions defined by user
-	this.userConversions = {};
+	    this.userConversions = {};
         this.pos;
         
         return this.start(ast.body);
@@ -67,9 +67,30 @@ module.exports = class Interpreter {
     varExists(name) {
         return this.variables[name] == null ? false : true;
     }
-    createVar(value, name) {
+    createVar(value, name, internal=false) {
+        if (!internal && name.startsWith("$") && name != "$last" && name != "$pid") {
+            throw new Error("Variable names beginning with '$' are reserved for pointers.");
+        }
         this.variables["util.last"] = value;
+        if (!this.variables["$last"]) {
+            this.setPointer("last", name);
+        }
         this.variables[name] = value;
+    }
+
+    setPointer(pointer, name) {
+        Object.defineProperty(this.variables, "$"+pointer, {
+            configurable: true,
+            get() {
+                return this[name];
+            },
+            set(value) {
+                this[name] = value;
+            }
+        });
+    }
+    deletePointer(pointer) {
+        delete this.variables["$" + pointer];
     }
 
     execConvert(fname, arg) {
@@ -92,11 +113,16 @@ module.exports = class Interpreter {
         return r;
     }
 
-    execFunc(fname, arg) {
+    execFunc(fname, arg, idname) {
         if (this.userFunctions[fname]) {
             this.createVar(arg?.value, "util.arg");
+            if (arg?.type == "IDENTIFIER") {
+                this.setPointer("pid", idname);
+            }
             const result = this.start(this.userFunctions[fname])[0] || null;
+
             this.deleteVar("util.arg", false);
+            this.deletePointer("pid");
             return result;
         }
         throw new Error(`Attempted to GET an uninitialized function: '${fname}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
@@ -104,12 +130,16 @@ module.exports = class Interpreter {
 
     fcall(node) {
         const fname = node.name.value;
+        let idname;
+        if (node.arg && node.arg.type == "IDENTIFIER") {
+            idname = node.arg.value;
+        }
         const arg = node.arg != null ? this.loop(node.arg) : node.arg;
         
         if (typeof this.getVar(fname, false) == "function") {
             return this.getVar(fname)(arg, node.arg, node);
         } else {
-            return this.execFunc(fname, arg, node.arg, node);
+            return this.execFunc(fname, arg, idname /*node.arg, node*/);
         }
     }
 
