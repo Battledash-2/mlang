@@ -8,12 +8,7 @@ module.exports = class Parser {
 
         return this.program();
     }
-
-    /*
-        [/^\bfunc\b/, "DEFINEF"], // functions definition keyword
-        [/^{/, "BOPEN"], // block open 
-        [/^}/, "BCLOSE"], // block close
-    */
+    
     block() {
         const body = [];
         this.advance("BOPEN");
@@ -146,28 +141,6 @@ module.exports = class Parser {
             position
         }
     }
-
-    // condition() { // CONDITION
-    //     this.advance("LPAREN");
-
-    //     let operator, right;
-        
-    //     let left = this.primary();
-    //     if (this.next.type == "CONDITION") {
-    //         operator = this.next;
-    //         this.advance();
-    //         right = this.primary();
-    //     }
-
-    //     this.advance("RPAREN");
-
-    //     return {
-    //         type: "CONDITION",
-    //         operator: operator?.value,
-    //         left,
-    //         right
-    //     }
-    // }
     
     conditional() {
         let pass, fail;
@@ -255,79 +228,29 @@ module.exports = class Parser {
     }
 
     condition() {
-        let left = this.unary();
-        let position = left.position;
-
-        while (this.next?.type == "CONDITION" && this.tokens.isOperation(this.next)) {
-            const operator = this.next.value;
-            this.advance("CONDITION");
-            const right = this.unary();
-
-            left = {
-                operator,
-                left,
-                right
-            }
-        }
-
-        return {
-            ...left,
-            position
-        };
+        return this.operationBuilder("isOperation", "unary");
     }
 
     exponent() {
-        let left = this.unary();
-        let position = left.position;
-
-        while (this.next?.type == "OPERATOR" && this.next.value == "^") {
-            const operator = this.next.value;
-            this.advance("OPERATOR");
-            const right = this.unary();
-
-            left = {
-                operator,
-                left,
-                right
-            }
-        }
-
-        return {
-            ...left,
-            position
-        };
+        return this.operationBuilder("isExponent", "unary");
     }
 
     multiplication() {
-        let left = this.exponent();
-        let position = left.position;
-
-        while (this.next?.type == "OPERATOR" && this.tokens.isMultiplier(this.next)) {
-            const operator = this.next.value;
-            this.advance("OPERATOR");
-            const right = this.exponent();
-
-            left = {
-                operator,
-                left,
-                right
-            }
-        }
-
-        return {
-            ...left,
-            position
-        };
+        return this.operationBuilder("isMultiplier", "exponent");
     }
 
     addition() {
-        let left = this.multiplication();
+        return this.operationBuilder("isAddition", "multiplication");
+    }
+
+    operationBuilder(tcheck="isAddition", next="multiplication") {
+        let left = this[next]();
         let position = left.position;
 
-        while (this.next?.type == "OPERATOR" && this.tokens.isAddition(this.next)) {
+        while (this.next?.type == "OPERATOR" && this.tokens[tcheck](this.next)) {
             const operator = this.next.value;
             this.advance("OPERATOR");
-            const right = this.multiplication();
+            const right = this[next]();
 
             left = {
                 operator,
