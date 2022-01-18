@@ -91,15 +91,21 @@ module.exports = class Parser {
         return r;
     }
 
-    fcall(n) {
+    arguments() {
         this.advance("LPAREN");
-        let arg = null;
-        if (this.next.type == "RPAREN") {
-            this.advance("RPAREN");
-        } else {
-            arg = this.operation();
-            this.advance("RPAREN");
-        }
+        let args = [];
+
+        do { // a do while will run at least once
+            if (this.next.type == "RPAREN") break;
+            args.push(this.primary());
+        } while (this.next?.type == "SEPERATOR" && this.advance())
+
+        this.advance("RPAREN");
+        return args.length > 1 ? args : args[0];
+    }
+
+    fcall(n) {
+        let arg = this.arguments();
         return {
             type: "FCALL",
             name: n,
@@ -185,6 +191,18 @@ module.exports = class Parser {
         }
     }
 
+    boolean() {
+        const result = {
+            type: "BOOLEAN",
+            value: Boolean(this.next.value),
+            position: this.next.position
+        }
+        if (this.advance("BOOLEAN")?.type == "CONVERT") {
+            return this.convert(result);
+        };
+        return result;
+    }
+
     primary() {
         switch (this.next?.type) {
             case "DEFINE":
@@ -205,6 +223,8 @@ module.exports = class Parser {
                 return this.import();
             case "CONDITIONAL": // CONDITIONAL_ELSE
                 return this.conditional();
+            case "BOOLEAN":
+                return this.boolean();
             default:
                 const r = this.next;
                 this.advance();

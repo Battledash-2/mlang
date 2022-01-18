@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const Tokenizer = require("./tokenizer");
 const Parser    = require("./parser");
 
@@ -43,13 +44,17 @@ module.exports = class Interpreter {
         return this.start(ast.body);
     }
 
+    implement(m) {
+        return new m(this);
+    }
+
     createToken(type, value, position) {
         return {
             type,
             value,
             position
         }
-    }h
+    }
 
     getVar(name, withError=true) {
         if (this.varExists(name)) {
@@ -69,7 +74,10 @@ module.exports = class Interpreter {
     }
     createVar(value, name, internal=false) {
         if (!internal && name.startsWith("$") && name != "$last" && name != "$pid") {
-            throw new Error("Variable names beginning with '$' are reserved for pointers.");
+            throw new Error(`Variable names beginning with '$' are reserved for pointers. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+        }
+        if (!internal && name.includes("::")) {
+            throw new Error(`Variables names with '::' are restricted for modules only. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
         }
         this.variables["util.last"] = value;
         if (!this.variables["$last"]) {
@@ -115,14 +123,41 @@ module.exports = class Interpreter {
 
     execFunc(fname, arg, idname) {
         if (this.userFunctions[fname]) {
-            this.createVar(arg?.value, "util.arg");
-            if (arg?.type == "IDENTIFIER") {
-                this.setPointer("pid", idname);
+            if (Array.isArray(arg)) {
+                for (let pos in arg) {
+                    let cur = arg[pos];
+                    let posi = pos == 0 ? "" : String(pos);
+
+                    this.createVar(cur.value, "util.arg"+posi);
+                    if (cur.type == "IDENTIFIER") {
+                        this.setPointer("pid"+posi, cur.value);
+                    }
+                }
+            } else {
+                this.createVar(arg?.value, "util.arg");
+                if (arg?.type == "IDENTIFIER") {
+                    this.setPointer("pid", idname);
+                }
             }
+            
             const result = this.start(this.userFunctions[fname])[0] || null;
 
-            this.deleteVar("util.arg", false);
-            this.deletePointer("pid");
+            if (Array.isArray(arg)) {
+                for (let pos in arg) {
+                    let cur = arg[pos];
+                    let posi = pos == 0 ? "" : String(pos);
+
+                    this.deleteVar("util.arg"+posi, false);
+                    if (cur.type == "IDENTIFIER") {
+                        this.deletePointer("pid"+posi);
+                    }
+                }
+            } else {
+                this.deleteVar("util.arg");
+                if (arg?.type == "IDENTIFIER") {
+                    this.deletePointer("pid");
+                }
+            }
             return result;
         }
         throw new Error(`Attempted to GET an uninitialized function: '${fname}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
@@ -130,11 +165,16 @@ module.exports = class Interpreter {
 
     fcall(node) {
         const fname = node.name.value;
-        let idname;
+        let idname, arg;
         if (node.arg && node.arg.type == "IDENTIFIER") {
             idname = node.arg.value;
         }
-        const arg = node.arg != null ? this.loop(node.arg) : node.arg;
+
+        if (Array.isArray(node.arg)) {
+            arg = node.arg
+        } else {
+            arg = node.arg != null ? this.loop(node.arg) : node.arg;
+        }
         
         if (typeof this.getVar(fname, false) == "function") {
             return this.getVar(fname)(arg, node.arg, node);
@@ -212,6 +252,9 @@ module.exports = class Interpreter {
             this.pos = node;
 
             const fname = node?.name?.value;
+            if (fname.includes("::")) {
+                throw new Error(`Variables names with '::' are restricted for modules only. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+            }
             const fbody = node?.body?.body;
             this.userFunctions[fname] = fbody;
             
@@ -233,6 +276,12 @@ module.exports = class Interpreter {
                 const fileContent = fs.readFileSync(node?.file);
                 const parsed = new Parser(new Tokenizer(String(fileContent), node?.file, node?.file), node?.file, node?.file);
                 this.start(parsed.body);
+            } else if (fs.existsSync(path.join(__dirname, node?.file))) {
+                const userModule = require(path.join(__dirname, node?.file));
+                this.implement(userModule);
+            } else if(fs.existsSync(path.join(__dirname, "core", "modules", node?.file))) {
+                const coreModule = require(path.join(__dirname, "core", "modules", node?.file));
+                this.implement(coreModule);
             } else {
                 throw new Error(`Attempt to import a non-existent file '${node?.file}' (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
             }
@@ -257,7 +306,7 @@ module.exports = class Interpreter {
                     return this.start(node?.fail?.body)[0] || null;
                 }
             } else {
-                if (this.varExists(node?.condition?.value) || node?.condition?.value > 0 || node?.condition?.value == "true") {
+                if (this.varExists(node?.condition?.value) || node?.condition?.value > 0 || node?.condition?.value == true) {
                     return this.start(node?.pass?.body)[0] || null;
                 } else if (node?.fail?.body != null) {
                     return this.start(node?.fail?.body)[0] || null;

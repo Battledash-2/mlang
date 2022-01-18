@@ -23,7 +23,7 @@ const specification = [
     [/^\b(true|false)\b/, "BOOLEAN"], // booleans (for operations)
 
     [/^\b(var|let)\b/, "DEFINE"], // variable definition keywords (there is no such thing as a constant, nor a scope)
-    [/^[a-zA-Z_$](\w|\.)*\b/, "IDENTIFIER"], // identifiers like variable names and referencing variables (also in use for conversions)
+    [/^[a-zA-Z_$](\w|\.|\:)*\b/, "IDENTIFIER"], // identifiers like variable names and referencing variables (also in use for conversions)
 
     [/^("|')((?:\\\1|(?:(?!\1).))*)\1/, "STRING"],
 
