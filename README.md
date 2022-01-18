@@ -4,7 +4,7 @@
 #### M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, and expressions.
 
 ## Project Status:
-- Waiting...
+- Javascript API
 
 ## Known Bugs
 - Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (Progress: On Hold)
