@@ -38,7 +38,8 @@ module.exports = class Parser {
         return {
             type: "DEFINEF",
             name: fname,
-            body
+            body,
+            position: fname.position
         }
     }
     
@@ -147,6 +148,17 @@ module.exports = class Parser {
             position
         }
     }
+
+    export() { // lets just see how it looks on gh fine
+        const exportName = this.advance("EXPORT").value;
+        this.advance("IDENTIFIER");
+        
+        return {
+            type: "EXPORT",
+            name: exportName,
+            position: this.next?.position
+        }
+    }
     
     conditional() {
         let pass, fail;
@@ -200,6 +212,8 @@ module.exports = class Parser {
                 return this.number();
             case "IMPORT":
                 return this.import();
+            case "EXPORT":
+                return this.export();
             case "CONDITIONAL": // CONDITIONAL_ELSE
                 return this.conditional();
             case "BOOLEAN":
@@ -273,6 +287,7 @@ module.exports = class Parser {
 
     operationBuilder(tcheck="isAddition", next="multiplication") {
         let left = this[next]();
+        if (left == null) return left;
         let position = left.position;
 
         while (this.next?.type == "OPERATOR" && this.tokens[tcheck](this.next)) {
@@ -319,7 +334,7 @@ module.exports = class Parser {
         const body = [];
         const loop=()=>{
             do {
-                const adv = this.variableExpression();
+                let adv = this.variableExpression();
                 body.push(adv);
             } while (this.next?.type == "EXPR_END" && this.advance("EXPR_END"));
             if (this.next != null) {

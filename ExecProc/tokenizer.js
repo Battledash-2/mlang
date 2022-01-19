@@ -17,6 +17,7 @@ const specification = [
     [/^}/, "BCLOSE"], // block close
 
     [/^\bimport\b/, "IMPORT"],
+    [/^\bexport\b/, "EXPORT"],
 
     [/^\bif\b/, "CONDITIONAL"], // booleans (for operations)
     [/^\belse\b/, "CONDITIONAL_ELSE"], // booleans (for operations)
