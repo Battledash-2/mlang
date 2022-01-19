@@ -64,5 +64,5 @@ util.log(m2 => m, km) // 5
 // -----------------------------------------
 let c = 40
 let f = c => c, f
-util.log(f) // negative numbers are not supported within conversion operations
+util.log(f)
 util.log(f => f, c)
