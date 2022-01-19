@@ -4,7 +4,7 @@
 #### M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, and expressions.
 
 ## Project Status
-#### Version: v1.6.1
+#### Version: v1.6.2
 - Thinking...
 
 ## Known Bugs

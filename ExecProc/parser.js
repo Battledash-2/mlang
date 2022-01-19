@@ -12,10 +12,17 @@ module.exports = class Parser {
     block() {
         const body = [];
         this.advance("BOPEN");
-        while(this.next.type != "BCLOSE") {
-            const adv = this.variableExpression();
-            body.push(adv);
+        const loop=()=>{
+            do {
+                const adv = this.variableExpression();
+                body.push(adv);
+            } while (this.next?.type == "EXPR_END" && this.advance("EXPR_END") && this.next?.type != "BCLOSE");
+            if (this.next?.type != "BCLOSE" && this.next != null) {
+                console.log('next', this.next)
+                loop();
+            }
         }
+        loop();
         this.advance("BCLOSE");
         return {
             type: 'BLOCK',
@@ -314,7 +321,7 @@ module.exports = class Parser {
             do {
                 const adv = this.variableExpression();
                 body.push(adv);
-            } while (this.next?.type == "EXPR_END" && this.advance());
+            } while (this.next?.type == "EXPR_END" && this.advance("EXPR_END"));
             if (this.next != null) {
                 loop();
             }
