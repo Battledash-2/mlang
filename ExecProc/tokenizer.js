@@ -1,7 +1,7 @@
 const specification = [
     [/^\/\/[^\n]*|^\/\*[\s\S]+?\*\//, "CMNT"], // this needs to have a higher precedence
 
-    [/^\.?\d+\.?\d*/, "NUMBER"], // for digits and numbers
+    [/^\.?\d+\.?\d*\b/, "NUMBER"], // for digits and numbers
     [/^[\+\-\/\*\^]/, "OPERATOR"], // operators
     [/^(===?|!==?|>=?|<=?|&&|\|\|)/, "CONDITION"], // operators
     
