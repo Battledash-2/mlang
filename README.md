@@ -4,8 +4,8 @@
 #### M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, and expressions.
 
 ## Project Status
-#### Version: v1.6.2
-- Thinking...
+#### Version: v1.6.3
+- Scopes and Imports
 
 ## Known Bugs
 - [ ] PENDING: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`)
