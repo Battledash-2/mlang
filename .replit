@@ -1,2 +1,0 @@
-language = "nix"
-run = "node index.js -f tests/bugfix_test.m"
