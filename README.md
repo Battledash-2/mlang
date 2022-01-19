@@ -8,6 +8,7 @@
 - Thinking...
 
 ## Known Bugs
+- [ ] PENDING: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`)
 - [x] FIXED: Nothing is working?? (Cause: This bug seems to be caused by the new feature which makes it possible for expressions to be split with `;`)
 - [x] FIXED: Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (This will still happen if you do something like `let a = 5 -a`)
 
