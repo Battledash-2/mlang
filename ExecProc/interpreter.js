@@ -305,8 +305,8 @@ module.exports = class Interpreter {
         }
 
         if (node?.type == "DEFINEC") { // this.userFunctions
-            var fname = node?.name;
-            var fname = fname[0]?.value+'-'+fname[1]?.value
+            let fname = node?.name;
+            let fname = fname[0]?.value+'-'+fname[1]?.value
             const fbody = node?.body?.body;
             this.userConversions[fname] = fbody
 
@@ -330,7 +330,7 @@ module.exports = class Interpreter {
         }
         
         if (node?.type == 'EXPORT') {
-            var exportName = node.name;
+            let exportName = node.name;
             if (!this.variables.hasOwnProperty(exportName)){
                 this.exports[exportName] = {
                     type: 'DEFINEF',
