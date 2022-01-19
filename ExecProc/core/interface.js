@@ -50,7 +50,7 @@ module.exports = class InterpreterInterface {
         this.interface.variables[name] = callback;
     }
     executeFunction(name="", argument={type:"",value:0,position:{line:0,cursor:0}}) {
-        this.interface.fcall({
+        return this.interface.fcall({
             name: {
                 value: name
             },
