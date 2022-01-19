@@ -16,6 +16,6 @@ module.exports = {
     "m-mi": (arg)=>arg.value * 0.621371 / 1000,
 
     // Temperature
-    "c-f": (arg)=>(arg.value * (9/5)) + 32,
+    "c-f": (arg)=>(arg.value * 9/5) + 32,
     "f-c": (arg)=>(arg.value - 32) * 5/9
 }
