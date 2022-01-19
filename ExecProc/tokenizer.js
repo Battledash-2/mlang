@@ -50,10 +50,6 @@ module.exports = class Tokenizer {
         this.pos = 0;
     }
 
-    isExponent(node) {
-        return node.value == "^";
-    }
-
     isMultiplier(node) {
         return node.value == "*" || node.value == "/";
     }

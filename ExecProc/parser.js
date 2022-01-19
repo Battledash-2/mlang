@@ -8,7 +8,12 @@ module.exports = class Parser {
 
         return this.program();
     }
-    
+
+    /*
+        [/^\bfunc\b/, "DEFINEF"], // functions definition keyword
+        [/^{/, "BOPEN"], // block open 
+        [/^}/, "BCLOSE"], // block close
+    */
     block() {
         const body = [];
         this.advance("BOPEN");
@@ -141,6 +146,28 @@ module.exports = class Parser {
             position
         }
     }
+
+    // condition() { // CONDITION
+    //     this.advance("LPAREN");
+
+    //     let operator, right;
+        
+    //     let left = this.primary();
+    //     if (this.next.type == "CONDITION") {
+    //         operator = this.next;
+    //         this.advance();
+    //         right = this.primary();
+    //     }
+
+    //     this.advance("RPAREN");
+
+    //     return {
+    //         type: "CONDITION",
+    //         operator: operator?.value,
+    //         left,
+    //         right
+    //     }
+    // }
     
     conditional() {
         let pass, fail;
@@ -228,29 +255,79 @@ module.exports = class Parser {
     }
 
     condition() {
-        return this.operationBuilder("isOperation", "unary");
+        let left = this.unary();
+        let position = left.position;
+
+        while (this.next?.type == "CONDITION" && this.tokens.isOperation(this.next)) {
+            const operator = this.next.value;
+            this.advance("CONDITION");
+            const right = this.unary();
+
+            left = {
+                operator,
+                left,
+                right
+            }
+        }
+
+        return {
+            ...left,
+            position
+        };
     }
 
     exponent() {
-        return this.operationBuilder("isExponent", "unary");
+        let left = this.unary();
+        let position = left.position;
+
+        while (this.next?.type == "OPERATOR" && this.next.value == "^") {
+            const operator = this.next.value;
+            this.advance("OPERATOR");
+            const right = this.unary();
+
+            left = {
+                operator,
+                left,
+                right
+            }
+        }
+
+        return {
+            ...left,
+            position
+        };
     }
 
     multiplication() {
-        return this.operationBuilder("isMultiplier", "exponent");
+        let left = this.exponent();
+        let position = left.position;
+
+        while (this.next?.type == "OPERATOR" && this.tokens.isMultiplier(this.next)) {
+            const operator = this.next.value;
+            this.advance("OPERATOR");
+            const right = this.exponent();
+
+            left = {
+                operator,
+                left,
+                right
+            }
+        }
+
+        return {
+            ...left,
+            position
+        };
     }
 
     addition() {
-        return this.operationBuilder("isAddition", "multiplication");
-    }
-
-    operationBuilder(tcheck="isAddition", next="multiplication") {
-        let left = this[next]();
+        let left = this.multiplication();
         let position = left.position;
 
-        while (this.next?.type == "OPERATOR" && this.tokens[tcheck](this.next)) {
+        while (this.next?.type == "OPERATOR" && this.tokens.isAddition(this.next)) {
             const operator = this.next.value;
             this.advance("OPERATOR");
-            const right = this[next]();
+            const right = this.multiplication();
 
             left = {
                 operator,
