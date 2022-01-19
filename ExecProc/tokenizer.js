@@ -1,7 +1,7 @@
 const specification = [
     [/^\/\/[^\n]*|^\/\*[\s\S]+?\*\//, "CMNT"], // this needs to have a higher precedence
 
-    [/^\.?\d+\.?\d*/, "NUMBER"], // for digits and numbers
+    [/^\.?\d+\.?\d*\b/, "NUMBER"], // for digits and numbers
     [/^[\+\-\/\*\^]/, "OPERATOR"], // operators
     [/^(===?|!==?|>=?|<=?|&&|\|\|)/, "CONDITION"], // operators
     
@@ -12,7 +12,7 @@ const specification = [
     [/^\)/, "RPAREN"], // closing parentheses (for functions and math)
 
     [/^\bfunc\b/, "DEFINEF"], // functions definition keyword
-	[/^\b(convert|conversion)\b/, "DEFINEC"], // define conversion
+    [/^\b(convert|conversion)\b/, "DEFINEC"], // define conversion
     [/^{/, "BOPEN"], // block open 
     [/^}/, "BCLOSE"], // block close
 
@@ -95,7 +95,7 @@ module.exports = class Tokenizer {
                 case "NL":
                     this.pos = 0;
                     this.line++;
-                    
+
                     return this.nextToken();
                 case "CMNT":
                     // const newlines = this.match(/\n+/g, match);

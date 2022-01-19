@@ -38,7 +38,7 @@ module.exports = class Interpreter {
 
         this.variables = require("./core/main")(this.createToken);
         this.userFunctions = {}; // functions defined by user
-	    this.userConversions = {};
+        this.userConversions = {};
         this.pos;
         
         return this.start(ast.body);
@@ -153,7 +153,7 @@ module.exports = class Interpreter {
                     }
                 }
             } else {
-                this.deleteVar("util.arg");
+                this.deleteVar("util.arg", false);
                 if (arg?.type == "IDENTIFIER") {
                     this.deletePointer("pid");
                 }
@@ -263,9 +263,9 @@ module.exports = class Interpreter {
 
         if (node?.type == "DEFINEC") { // this.userFunctions
             var fname = node?.name;
-	        var fname = fname[0]?.value+'-'+fname[1]?.value
+            var fname = fname[0]?.value+'-'+fname[1]?.value
             const fbody = node?.body?.body;
-	        this.userConversions[fname] = fbody
+            this.userConversions[fname] = fbody
 
             return null;
         }
