@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const Tokenizer = require("./tokenizer");
 const Parser    = require("./parser");
-
 const conversions = require("./core/convert");
 
 const operations = {
@@ -32,13 +31,15 @@ const binOperations = {
 }
 
 module.exports = class Interpreter {
-    constructor(ast, fn, fp) {
+    constructor(ast, fn, fp, returnExports=false) {
         this.fn = fn;
         this.fp = fp;
 
         this.variables = require("./core/main")(this.createToken);
         this.userFunctions = {}; // functions defined by user
         this.userConversions = {};
+        this.exports = {};
+        this.returnExports = returnExports;
         this.pos;
         
         return this.start(ast.body);
@@ -56,12 +57,13 @@ module.exports = class Interpreter {
         }
     }
 
-    getVar(name, withError=true) {
+	getVar(name, withError=true) {
         if (this.varExists(name)) {
             return this.variables[name];
         }
         if (withError) throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
     }
+    
     deleteVar(name, withError=true) {
         if (this.varExists(name)) {
             delete this.variables[name];
@@ -69,9 +71,11 @@ module.exports = class Interpreter {
         }
         if (withError) throw new Error(`Attempted to DELETE an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
     }
+    
     varExists(name) {
         return this.variables[name] == null ? false : true;
     }
+    
     createVar(value, name, internal=false) {
         if (!internal && name.startsWith("$") && name != "$last" && name != "$pid") {
             throw new Error(`Variable names beginning with '$' are reserved for pointers. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
@@ -118,7 +122,11 @@ module.exports = class Interpreter {
             if (add == null) continue;
             r.push(add);
         }
-        return r;
+        if (this.returnExports){
+            return this.exports;
+        } else {
+            return r;
+        }
     }
 
     execFunc(fname, arg, idname) {
@@ -163,7 +171,25 @@ module.exports = class Interpreter {
         throw new Error(`Attempted to GET an uninitialized function: '${fname}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
     }
 
-    fcall(node) {
+    importFile(node) {
+        const fileContent = fs.readFileSync(node?.file);
+        const filename = node?.file;
+        const module_name = filename.split('.', 1)[0];
+        
+        const tokens  = new Tokenizer(fileContent, filename, filename);
+        const ast     = new Parser(tokens, filename, filename);        
+        const exports = new Interpreter(ast, filename, filename, true);
+        
+        Object.entries(exports).forEach(([name, value]) => {
+            if (value.type === 'DEFINEF'){
+                this.userFunctions[module_name+'::'+name] = value.body;
+            } else {
+                this.variables[module_name+'::'+name] = value.value;
+            }
+        });
+    }
+
+	fcall(node) {
         const fname = node.name.value;
         let idname, arg;
         if (node.arg && node.arg.type == "IDENTIFIER") {
@@ -202,6 +228,9 @@ module.exports = class Interpreter {
     loop(node, errorOnUndefined=true) {
         if (node?.type == "DEFINITION") {
             this.pos = node;
+            if (this.userFunctions.hasOwnProperty(node.name)) {
+                delete this.userFunctions[node.name];
+            }
             if (node.value.left) {
                 this.createVar(this.evaluate(
                     this.loop(node.value.left),
@@ -217,12 +246,25 @@ module.exports = class Interpreter {
             }
             return null;
         }
-    
+
         if (node?.type == "IDENTIFIER") {
             this.pos = node;
+            let value;
+            if (this.userFunctions.hasOwnProperty(node.value)){
+                value = {
+                    type: "DEFINEF",
+                    body: {
+                        type: "BLOCK",
+                        body: this.userFunctions[node.value]
+                    },
+                    position: this.pos.position,
+                }
+            } else {
+                value = this.getVar(node.value, errorOnUndefined)
+            }
             return {
                 type: node.type,
-                value: this.getVar(node.value, errorOnUndefined),
+                value: value,
                 position: node.position
             }
         }
@@ -273,9 +315,7 @@ module.exports = class Interpreter {
         if (node?.type == "IMPORT") {
             this.pos = node;
             if (fs.existsSync(node?.file)) {
-                const fileContent = fs.readFileSync(node?.file);
-                const parsed = new Parser(new Tokenizer(String(fileContent), node?.file, node?.file), node?.file, node?.file);
-                this.start(parsed.body);
+                this.importFile(node);
             } else if (fs.existsSync(path.join(__dirname, node?.file))) {
                 const userModule = require(path.join(__dirname, node?.file));
                 this.implement(userModule);
@@ -287,7 +327,22 @@ module.exports = class Interpreter {
             }
             return null;
         }
-
+        
+        if (node?.type == 'EXPORT') {
+            var exportName = node.name;
+            if (!this.variables.hasOwnProperty(exportName)){
+                this.exports[exportName] = {
+                    type: 'DEFINEF',
+                    body: this.userFunctions[exportName],
+                };
+            } else {
+                this.exports[exportName] = {
+                    type: 'VARIABLE',
+                    value: this.getVar(exportName, false)
+                };
+            };
+            return null;
+        }
         if (node?.type == "UNARY") {
             this.pos = node;
 
