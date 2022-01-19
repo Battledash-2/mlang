@@ -57,7 +57,7 @@ module.exports = class Interpreter {
         }
     }
 
-	getVar(name, withError=true) {
+    getVar(name, withError=true) {
         if (this.varExists(name)) {
             return this.variables[name];
         }
