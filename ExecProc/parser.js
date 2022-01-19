@@ -366,11 +366,10 @@ module.exports = class Parser {
 
     program() {
         const body = [];
-        while(true) {
-            if (this.next == null) break;
+        do {
             const adv = this.variableExpression();
             body.push(adv);
-        }
+        } while (this.next?.type == "EXPR_END" && this.advance("EXPR_END"));
         return {
             type: 'program',
             body
@@ -378,9 +377,12 @@ module.exports = class Parser {
     }
 
     advance(type=null) {
+        function throwError(error) {
+            throw new Error(error);
+        };
         if (type != null) {
-            if (this.next == null) throw new Error(`Unexpected end of input while expecting '${type}'`);
-            if (this.next.type != type) throw new Error(`Unexpected token '${this.next.type}': Expected type of '${type}' (${this.fn}:${this.next.position.line}:${this.next.position.cursor})`);
+            if (this.next == null) throwError(`Unexpected end of input while expecting '${type}'`);
+            if (this.next.type != type) throwError(`Unexpected token '${this.next.type}': Expected type of '${type}' (${this.fn}:${this.next.position.line}:${this.next.position.cursor})`);
         }
 
         this.next = this.tokens.nextToken();
