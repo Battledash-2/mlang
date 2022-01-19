@@ -30,7 +30,7 @@ const specification = [
     [/^=/, null], // '=' in case someone uses (let a **=** 58) this also means you can do (let a 58)
     [/^\n/, "NL"], // new line for error messaging
     [/^\s/, null], // whitespace 
-    [/^;/, "EXPR_END"] // semi-colons
+    [/^;/, null] // semi-colons
 ]
 
 module.exports = class Tokenizer {
