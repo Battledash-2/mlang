@@ -1,11 +1,11 @@
-# MLang (v1.6.1): The Mathematics Language
+# MLang (v1.6.3): The Mathematics Language
 
 ## What is M
 #### M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, and expressions.
 
 ## Project Status
 #### Version: v1.6.3
-- Scopes and Imports
+- Improved imports with `export` keyword.
 
 ## Known Bugs
 - [ ] PENDING: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`)
@@ -24,6 +24,7 @@
 - [x] Pseudo-pointers / Reference to `$pid` (passed in variable to a function) and `$last` (last variable set) (Priority: unexpected)
 - [x] Conditional statements (Priority: HIGH)
 - [x] Multi-line comments (Priority: extremely low)
+- [x] Export keyword (Priority: unknown)
 - [x] Import files (Priority: unknown)
 - [x] Minimal string support (Priority: unknown)
 - [x] Functions (Priority: Medium)
