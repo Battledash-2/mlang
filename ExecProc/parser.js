@@ -8,12 +8,7 @@ module.exports = class Parser {
 
         return this.program();
     }
-
-    /*
-        [/^\bfunc\b/, "DEFINEF"], // functions definition keyword
-        [/^{/, "BOPEN"], // block open 
-        [/^}/, "BCLOSE"], // block close
-    */
+    
     block() {
         const body = [];
         this.advance("BOPEN");
@@ -91,15 +86,21 @@ module.exports = class Parser {
         return r;
     }
 
-    fcall(n) {
+    arguments() {
         this.advance("LPAREN");
-        let arg = null;
-        if (this.next.type == "RPAREN") {
-            this.advance("RPAREN");
-        } else {
-            arg = this.operation();
-            this.advance("RPAREN");
-        }
+        let args = [];
+
+        do { // a do while will run at least once
+            if (this.next.type == "RPAREN") break;
+            args.push(this.primary());
+        } while (this.next?.type == "SEPERATOR" && this.advance())
+
+        this.advance("RPAREN");
+        return args.length > 1 ? args : args[0];
+    }
+
+    fcall(n) {
+        let arg = this.arguments();
         return {
             type: "FCALL",
             name: n,
@@ -140,6 +141,40 @@ module.exports = class Parser {
             position
         }
     }
+    
+    conditional() {
+        let pass, fail;
+
+        this.advance("CONDITIONAL");
+        this.advance("LPAREN");
+        const condition = this.condition();
+        this.advance("RPAREN");
+
+        pass = this.block();
+
+        if (this.next?.type == "CONDITIONAL_ELSE" && this.advance()) {
+            fail = this.block();
+        }
+
+        return {
+            type: "CONDITION",
+            condition,
+            pass,
+            fail
+        }
+    }
+
+    boolean() {
+        const result = {
+            type: "BOOLEAN",
+            value: Boolean(this.next.value),
+            position: this.next.position
+        }
+        if (this.advance("BOOLEAN")?.type == "CONVERT") {
+            return this.convert(result);
+        };
+        return result;
+    }
 
     primary() {
         switch (this.next?.type) {
@@ -159,6 +194,10 @@ module.exports = class Parser {
                 return this.number();
             case "IMPORT":
                 return this.import();
+            case "CONDITIONAL": // CONDITIONAL_ELSE
+                return this.conditional();
+            case "BOOLEAN":
+                return this.boolean();
             default:
                 const r = this.next;
                 this.advance();
@@ -188,58 +227,30 @@ module.exports = class Parser {
         return this.primary();
     }
 
+    condition() {
+        return this.operationBuilder("isOperation", "unary");
+    }
+
     exponent() {
-        let left = this.unary();
-        let position = left.position;
-
-        while (this.next?.type == "OPERATOR" && this.next.value == "^") {
-            const operator = this.next.value;
-            this.advance("OPERATOR");
-            const right = this.unary();
-
-            left = {
-                operator,
-                left,
-                right
-            }
-        }
-
-        return {
-            ...left,
-            position
-        };
+        return this.operationBuilder("isExponent", "unary");
     }
 
     multiplication() {
-        let left = this.exponent();
-        let position = left.position;
-
-        while (this.next?.type == "OPERATOR" && this.tokens.isMultiplier(this.next)) {
-            const operator = this.next.value;
-            this.advance("OPERATOR");
-            const right = this.exponent();
-
-            left = {
-                operator,
-                left,
-                right
-            }
-        }
-
-        return {
-            ...left,
-            position
-        };
+        return this.operationBuilder("isMultiplier", "exponent");
     }
 
     addition() {
-        let left = this.multiplication();
+        return this.operationBuilder("isAddition", "multiplication");
+    }
+
+    operationBuilder(tcheck="isAddition", next="multiplication") {
+        let left = this[next]();
         let position = left.position;
 
-        while (this.next?.type == "OPERATOR" && this.tokens.isAddition(this.next)) {
+        while (this.next?.type == "OPERATOR" && this.tokens[tcheck](this.next)) {
             const operator = this.next.value;
             this.advance("OPERATOR");
-            const right = this.multiplication();
+            const right = this[next]();
 
             left = {
                 operator,
@@ -278,11 +289,10 @@ module.exports = class Parser {
 
     program() {
         const body = [];
-        while(true) {
-            if (this.next == null) break;
+        do {
             const adv = this.variableExpression();
             body.push(adv);
-        }
+        } while (this.next?.type == "EXPR_END" && this.advance("EXPR_END"));
         return {
             type: 'program',
             body
@@ -290,9 +300,12 @@ module.exports = class Parser {
     }
 
     advance(type=null) {
+        function throwError(error) {
+            throw new Error(error);
+        };
         if (type != null) {
-            if (this.next == null) throw new Error(`Unexpected end of input while expecting '${type}'`);
-            if (this.next.type != type) throw new Error(`Unexpected token '${this.next.type}': Expected type of '${type}' (${this.fn}:${this.next.position.line}:${this.next.position.cursor})`);
+            if (this.next == null) throwError(`Unexpected end of input while expecting '${type}'`);
+            if (this.next.type != type) throwError(`Unexpected token '${this.next.type}': Expected type of '${type}' (${this.fn}:${this.next.position.line}:${this.next.position.cursor})`);
         }
 
         this.next = this.tokens.nextToken();

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const Tokenizer = require("./tokenizer");
 const Parser    = require("./parser");
 
@@ -14,6 +15,22 @@ const operations = {
     "-": (l, r) => l - r
 }
 
+const binOperations = {
+    "==": (l, r) => l == r,
+    "===": (l, r) => l === r,
+
+    "!=": (l, r) => l != r,
+    "!==": (l, r) => l !== r,
+
+    "&&": (l, r) => l && r,
+    "||": (l, r) => l || r,
+
+    ">=": (l, r) => l >= r,
+    "<=": (l, r) => l <= r,
+    ">": (l, r) => l > r,
+    "<": (l, r) => l < r
+}
+
 module.exports = class Interpreter {
     constructor(ast, fn, fp) {
         this.fn = fn;
@@ -21,10 +38,14 @@ module.exports = class Interpreter {
 
         this.variables = require("./core/main")(this.createToken);
         this.userFunctions = {}; // functions defined by user
-	this.userConversions = {};
+	    this.userConversions = {};
         this.pos;
         
         return this.start(ast.body);
+    }
+
+    implement(m) {
+        return new m(this);
     }
 
     createToken(type, value, position) {
@@ -32,19 +53,6 @@ module.exports = class Interpreter {
             type,
             value,
             position
-        }
-    }
-
-    evaluate({ value: l }, { value: r }, operator) {
-        if (operator != null) {
-            if (l.type == "IDENTIFIER") {
-                l = this.getVar(l.value);
-            }
-            if (r.type == "IDENTIFIER") {
-                r = this.getVar(r.value);
-            }
-
-            return operations[operator](l, r);
         }
     }
 
@@ -64,9 +72,33 @@ module.exports = class Interpreter {
     varExists(name) {
         return this.variables[name] == null ? false : true;
     }
-    createVar(value, name) {
+    createVar(value, name, internal=false) {
+        if (!internal && name.startsWith("$") && name != "$last" && name != "$pid") {
+            throw new Error(`Variable names beginning with '$' are reserved for pointers. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+        }
+        if (!internal && name.includes("::")) {
+            throw new Error(`Variables names with '::' are restricted for modules only. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+        }
         this.variables["util.last"] = value;
+        if (!this.variables["$last"]) {
+            this.setPointer("last", name);
+        }
         this.variables[name] = value;
+    }
+
+    setPointer(pointer, name) {
+        Object.defineProperty(this.variables, "$"+pointer, {
+            configurable: true,
+            get() {
+                return this[name];
+            },
+            set(value) {
+                this[name] = value;
+            }
+        });
+    }
+    deletePointer(pointer) {
+        delete this.variables["$" + pointer];
     }
 
     execConvert(fname, arg) {
@@ -89,11 +121,43 @@ module.exports = class Interpreter {
         return r;
     }
 
-    execFunc(fname, arg) {
+    execFunc(fname, arg, idname) {
         if (this.userFunctions[fname]) {
-            this.createVar(arg?.value, "util.arg");
+            if (Array.isArray(arg)) {
+                for (let pos in arg) {
+                    let cur = arg[pos];
+                    let posi = pos == 0 ? "" : String(pos);
+
+                    this.createVar(cur.value, "util.arg"+posi);
+                    if (cur.type == "IDENTIFIER") {
+                        this.setPointer("pid"+posi, cur.value);
+                    }
+                }
+            } else {
+                this.createVar(arg?.value, "util.arg");
+                if (arg?.type == "IDENTIFIER") {
+                    this.setPointer("pid", idname);
+                }
+            }
+            
             const result = this.start(this.userFunctions[fname])[0] || null;
-            this.deleteVar("util.arg", false);
+
+            if (Array.isArray(arg)) {
+                for (let pos in arg) {
+                    let cur = arg[pos];
+                    let posi = pos == 0 ? "" : String(pos);
+
+                    this.deleteVar("util.arg"+posi, false);
+                    if (cur.type == "IDENTIFIER") {
+                        this.deletePointer("pid"+posi);
+                    }
+                }
+            } else {
+                this.deleteVar("util.arg");
+                if (arg?.type == "IDENTIFIER") {
+                    this.deletePointer("pid");
+                }
+            }
             return result;
         }
         throw new Error(`Attempted to GET an uninitialized function: '${fname}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
@@ -101,16 +165,41 @@ module.exports = class Interpreter {
 
     fcall(node) {
         const fname = node.name.value;
-        const arg = node.arg != null ? this.loop(node.arg) : node.arg;
+        let idname, arg;
+        if (node.arg && node.arg.type == "IDENTIFIER") {
+            idname = node.arg.value;
+        }
 
+        if (Array.isArray(node.arg)) {
+            arg = node.arg
+        } else {
+            arg = node.arg != null ? this.loop(node.arg) : node.arg;
+        }
+        
         if (typeof this.getVar(fname, false) == "function") {
             return this.getVar(fname)(arg, node.arg, node);
         } else {
-            return this.execFunc(fname, arg, node.arg, node);
+            return this.execFunc(fname, arg, idname /*node.arg, node*/);
         }
     }
 
-    loop(node) {
+    evaluate({ value: l }, { value: r }, operator, eou=true) {
+        if (operator != null) {
+            if (l.type == "IDENTIFIER") {
+                l = this.getVar(l.value, eou);
+            }
+            if (r?.type == "IDENTIFIER") {
+                r = this.getVar(r.value, eou);
+            }
+
+            if (operations[operator]) return operations[operator](l, r);
+            if (binOperations[operator]) return binOperations[operator](l, r);
+
+            throw new Error(`Could not find operator '${operator}' internally (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
+        }
+    }
+
+    loop(node, errorOnUndefined=true) {
         if (node?.type == "DEFINITION") {
             this.pos = node;
             if (node.value.left) {
@@ -130,11 +219,10 @@ module.exports = class Interpreter {
         }
     
         if (node?.type == "IDENTIFIER") {
-            // console.log("A", node?.type, node)
             this.pos = node;
             return {
                 type: node.type,
-                value: this.getVar(node.value),
+                value: this.getVar(node.value, errorOnUndefined),
                 position: node.position
             }
         }
@@ -147,7 +235,7 @@ module.exports = class Interpreter {
         if (node?.type == "CONVERT") {
             this.pos = node;
             if (this.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)){
-                    return this.execConvert(`${node.from?.value}-${node.to?.value}`, this.loop(node.value))
+                return this.execConvert(`${node.from?.value}-${node.to?.value}`, this.loop(node.value))
             } else if (conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
                 return {
                     type: "NUMBER",
@@ -164,6 +252,9 @@ module.exports = class Interpreter {
             this.pos = node;
 
             const fname = node?.name?.value;
+            if (fname.includes("::")) {
+                throw new Error(`Variables names with '::' are restricted for modules only. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+            }
             const fbody = node?.body?.body;
             this.userFunctions[fname] = fbody;
             
@@ -185,31 +276,46 @@ module.exports = class Interpreter {
                 const fileContent = fs.readFileSync(node?.file);
                 const parsed = new Parser(new Tokenizer(String(fileContent), node?.file, node?.file), node?.file, node?.file);
                 this.start(parsed.body);
+            } else if (fs.existsSync(path.join(__dirname, node?.file))) {
+                const userModule = require(path.join(__dirname, node?.file));
+                this.implement(userModule);
+            } else if(fs.existsSync(path.join(__dirname, "core", "modules", node?.file))) {
+                const coreModule = require(path.join(__dirname, "core", "modules", node?.file));
+                this.implement(coreModule);
             } else {
                 throw new Error(`Attempt to import a non-existent file '${node?.file}' (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
             }
             return null;
         }
 
-        /*
-        type: "UNARY",
-            value: Number(num.value),
-            operator: op.value,
-            position: {
-                cursor: op.position.cursor,
-                line: op.position.line
-            }
-            */
         if (node?.type == "UNARY") {
             this.pos = node;
+
             return {
                 type: "NUMBER",
-                value: Number(node?.operator + this.loop(node?.value).value),
+                value: Number(node?.operator + Math.abs(this.loop(node?.value).value)),
                 position: node?.position
             };
         }
 
-        if (node?.value) {
+        if (node?.type == "CONDITION") {
+            if (node?.condition?.left) {
+                if (this.evaluate(this.loop(node?.condition?.left, false), this.loop(node?.condition?.right, false), node?.condition?.operator, false)) {
+                    return this.start(node?.pass?.body)[0] || null;
+                } else if (node?.fail?.body != null) {
+                    return this.start(node?.fail?.body)[0] || null;
+                }
+            } else {
+                if (this.varExists(node?.condition?.value) || node?.condition?.value > 0 || node?.condition?.value == true) {
+                    return this.start(node?.pass?.body)[0] || null;
+                } else if (node?.fail?.body != null) {
+                    return this.start(node?.fail?.body)[0] || null;
+                }
+            }
+            return null;
+        }
+
+        if (node?.value != null) {
             this.pos = node;
             return node;
         }
@@ -219,9 +325,10 @@ module.exports = class Interpreter {
         return {
             type: node.type,
             value: this.evaluate(
-                this.loop(node.left),
-                this.loop(node.right),
-                node.operator // this could be `null`
+                this.loop(node.left, errorOnUndefined),
+                this.loop(node.right, errorOnUndefined),
+                node.operator, // this could be `null`
+                errorOnUndefined
             ),
             position: node.position
         }

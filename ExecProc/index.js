@@ -6,8 +6,9 @@ module.exports = class ExecProc {
 	constructor(source, filename, absolutePath) {
         const tokens = new Tokenizer(source, filename, absolutePath);
         const ast    = new Parser(tokens, filename, absolutePath);
-        return         new Interpreter(ast, filename, absolutePath);
 
         // return         ast;
+        
+        return         new Interpreter(ast, filename, absolutePath);
     }
 };

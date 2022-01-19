@@ -6,6 +6,8 @@ module.exports = (createToken)=>{
         "util.log": (arg)=>console.log(arg.value),
         "util.sin": (arg, pos)=>createToken("NUMBER", Math.sin(arg.value), pos.position),
         "util.cosin": (arg, pos)=>createToken("NUMBER", Math.cos(arg.value), pos.position),
+        "util.len": (arg, pos)=>createToken("NUMBER", String(arg.value).length, pos.position),
+        "util.has": (args, pos)=>createToken("BOOLEAN", args[0].value.includes(args[1].value), pos.position),
         // ...require("./convert")(createToken)
     }
 };
