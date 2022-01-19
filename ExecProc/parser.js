@@ -94,7 +94,6 @@ module.exports = class Parser {
             if (this.next.type == "RPAREN") break;
             args.push(this.primary());
         } while (this.next?.type == "SEPERATOR" && this.advance())
-
         this.advance("RPAREN");
         return args.length > 1 ? args : args[0];
     }
@@ -198,6 +197,10 @@ module.exports = class Parser {
                 return this.conditional();
             case "BOOLEAN":
                 return this.boolean();
+            case "OPERATOR":
+                return this.operation();
+            case "EXPR_END":
+                return null;
             default:
                 const r = this.next;
                 this.advance();
@@ -228,7 +231,25 @@ module.exports = class Parser {
     }
 
     condition() {
-        return this.operationBuilder("isOperation", "unary");
+        let left = this.unary();
+        let position = left.position;
+
+        while (this.next?.type == "CONDITION" && this.tokens.isOperation(this.next)) {
+            const operator = this.next.value;
+            this.advance("CONDITION");
+            const right = this.unary();
+
+            left = {
+                operator,
+                left,
+                right
+            }
+        }
+
+        return {
+            ...left,
+            position
+        };
     }
 
     exponent() {
@@ -289,10 +310,16 @@ module.exports = class Parser {
 
     program() {
         const body = [];
-        do {
-            const adv = this.variableExpression();
-            body.push(adv);
-        } while (this.next?.type == "EXPR_END" && this.advance("EXPR_END"));
+        const loop=()=>{
+            do {
+                const adv = this.variableExpression();
+                body.push(adv);
+            } while (this.next?.type == "EXPR_END" && this.advance());
+            if (this.next != null) {
+                loop();
+            }
+        }
+        loop();
         return {
             type: 'program',
             body

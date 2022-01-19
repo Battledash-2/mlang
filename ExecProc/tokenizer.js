@@ -95,7 +95,7 @@ module.exports = class Tokenizer {
                 case "NL":
                     this.pos = 0;
                     this.line++;
-                    
+
                     return this.nextToken();
                 case "CMNT":
                     // const newlines = this.match(/\n+/g, match);

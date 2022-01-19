@@ -7,12 +7,8 @@
 - Thinking...
 
 ## Known Bugs
-<<<<<<< HEAD
-- [ ] Nothing is working??
+- [x] FIXED: Nothing is working??
 - [x] FIXED: Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (This will still happen if you do something like `let a = 5 -a`)
-=======
-- Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (Progress: On Hold)
->>>>>>> parent of c7b66cc (Bug fixes)
 
 ## To-Do
 - [ ] Arrays (Priority: HIGH)

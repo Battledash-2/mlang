@@ -153,7 +153,7 @@ module.exports = class Interpreter {
                     }
                 }
             } else {
-                this.deleteVar("util.arg");
+                this.deleteVar("util.arg", false);
                 if (arg?.type == "IDENTIFIER") {
                     this.deletePointer("pid");
                 }
