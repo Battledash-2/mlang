@@ -92,7 +92,7 @@ module.exports = class Parser {
 
         do { // a do while will run at least once
             if (this.next.type == "RPAREN") break;
-            args.push(this.primary());
+            args.push(this.operation());
         } while (this.next?.type == "SEPERATOR" && this.advance())
         this.advance("RPAREN");
         return args.length > 1 ? args : args[0];
