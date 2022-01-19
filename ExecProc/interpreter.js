@@ -190,7 +190,7 @@ module.exports = class Interpreter {
         });
     }
 
-	fcall(node) {
+    fcall(node) {
         const fname = node.name.value;
         let idname, arg;
         if (node.arg && node.arg.type == "IDENTIFIER") {

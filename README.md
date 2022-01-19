@@ -4,7 +4,7 @@
 #### M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, and expressions.
 
 ## Project Status
-#### Version: v1.6.3
+#### Version: v1.6.4
 - Scopes and imports.
 
 ## Known Bugs
@@ -19,6 +19,7 @@
 - [ ] Arrays (Priority: HIGH)
 
 ## Done
+- [x] Better `import`/`export`
 - [x] Multiple arguments in functions (util.arg, util.arg1, util.arg2 || $pid, $pid1, $pid2)
 - [x] Javascript API (Priority: extremely low / not expected soon)
 - [x] Pseudo-pointers / Reference to `$pid` (passed in variable to a function) and `$last` (last variable set) (Priority: unexpected)
