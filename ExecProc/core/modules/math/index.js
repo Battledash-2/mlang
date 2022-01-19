@@ -19,7 +19,7 @@ module.exports = class MathPKG extends Interface {
 
                 arr.push(v.value);
             }
-            return this.createToken("NUMBER", arr.sort((x,y)=>x-y).slice(-1));
+            return this.createToken("NUMBER", Math.max(...arr), this.getPositionObject());
         });
         this.createFunction("math::min", (arg)=>{
             let arr = [];
@@ -29,7 +29,7 @@ module.exports = class MathPKG extends Interface {
 
                 arr.push(v.value);
             }
-            return this.createToken("NUMBER", arr.sort((x,y)=>x-y).slice(0, 1));
+            return this.createToken("NUMBER", Math.min(...arr), this.getPositionObject());
         });
     }
 }
