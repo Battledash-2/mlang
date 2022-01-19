@@ -185,8 +185,8 @@ module.exports = class Parser {
                 return this.identifier();
             case "DEFINEF":
                 return this.functionDefinition();
- 			case "DEFINEC":
-				return this.convertDefinition();
+             case "DEFINEC":
+                return this.convertDefinition();
             case "STRING":
                 return this.string();
             case "NUMBER":
