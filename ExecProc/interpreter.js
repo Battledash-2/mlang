@@ -305,8 +305,7 @@ module.exports = class Interpreter {
         }
 
         if (node?.type == "DEFINEC") { // this.userFunctions
-            let fname = node?.name;
-            let fname = fname[0]?.value+'-'+fname[1]?.value
+            let fname = node?.name[0]?.value+'-'+node?.name[1]?.value
             const fbody = node?.body?.body;
             this.userConversions[fname] = fbody
 
