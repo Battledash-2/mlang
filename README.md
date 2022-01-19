@@ -5,7 +5,7 @@
 
 ## Project Status
 #### Version: v1.6.3
-- Improved imports with `export` keyword.
+- Scopes and imports.
 
 ## Known Bugs
 - [ ] PENDING: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`)
