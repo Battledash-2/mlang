@@ -1,3 +1,3 @@
 import "imports2.m"
 
-importMe("hello")
+imports2::importMe("hello")
