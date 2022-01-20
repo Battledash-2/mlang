@@ -4,8 +4,8 @@
 #### M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, and expressions.
 
 ## Project Status
-#### Version: v1.6.4
-- Scopes and imports.
+#### Version: v1.6.6
+- Scopes
 
 ## Known Bugs
 - [ ] PENDING: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`)
@@ -13,7 +13,6 @@
 - [x] FIXED: Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (This will still happen if you do something like `let a = 5 -a`)
 
 ## To-Do (in order from Most Important to Least Important)
-- [ ] Operations like `varName += 5`
 - [ ] Scopes
 - [ ] For & (Do)? While Loop
 
@@ -23,6 +22,7 @@
 - [ ] Arrays (Priority: HIGH)
 
 ## Done
+- [x] Operations like `varName += 5`
 - [x] Better `import`/`export`
 - [x] Multiple arguments in functions (util.arg, util.arg1, util.arg2 || $pid, $pid1, $pid2)
 - [x] Javascript API (Priority: extremely low / not expected soon)

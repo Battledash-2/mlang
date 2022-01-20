@@ -2,10 +2,13 @@ const specification = [
     [/^\/\/[^\n]*|^\/\*[\s\S]+?\*\//, "CMNT"], // this needs to have a higher precedence
 
     [/^\.?\d+\.?\d*\b/, "NUMBER"], // for digits and numbers
+
+    [/^=>/, "CONVERT"], // conversion operators (100 => km, mi)
+    [/^(=|\+=|-=|\*=|%=|\^=)/, "ASSIGNMENT"], // operators
+
     [/^[\+\-\/\*\^]/, "OPERATOR"], // operators
     [/^(===?|!==?|>=?|<=?|&&|\|\|)/, "CONDITION"], // operators
     
-    [/^=>/, "CONVERT"], // conversion operators (100 => km, mi)
     [/^,/, "SEPERATOR"], // seperates (km, mi)
 
     [/^\(/, "LPAREN"], // opening parentheses (for functions and math)
@@ -28,7 +31,6 @@ const specification = [
 
     [/^("|')((?:\\\1|(?:(?!\1).))*)\1/, "STRING"],
 
-    [/^=/, null], // '=' in case someone uses (let a **=** 58) this also means you can do (let a 58)
     [/^\n/, "NL"], // new line for error messaging
     [/^\s/, null], // whitespace 
     [/^;/, "EXPR_END"] // semi-colons
@@ -65,7 +67,14 @@ module.exports = class Tokenizer {
 
     isOperation(node) {
         // (===?|!==?|>=?|<=?|&&)
+        // ^(=|\+=|-=|\*=|%=)
         return node.value.match(/^(===?|!==?|>=?|<=?|&&|\|\|)/)?.length > 0;
+    }
+
+    isAssignment(node) {
+        // (===?|!==?|>=?|<=?|&&)
+        // ^(=|\+=|-=|\*=|%=)
+        return node.value.match(/^(=|\+=|-=|\*=|%=|\^=)/)?.length > 0;
     }
 
     eof() {

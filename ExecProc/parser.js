@@ -120,6 +120,20 @@ module.exports = class Parser {
         }
     }
 
+    assignment(value) {
+        const operator = this.next.value;
+        this.advance("ASSIGNMENT");
+        let withOp = this.operation();
+
+        return {
+            type: "ASSIGN",
+            operator,
+            variable: value,
+            operation: withOp,
+            position: value?.position
+        };
+    }
+
     identifier() {
         let r = this.next;
         let a = this.advance();
@@ -127,6 +141,8 @@ module.exports = class Parser {
             return this.fcall(r);
         } else if (a?.type == "CONVERT") {
             return this.convert(r);
+        } else if (a?.type == "ASSIGNMENT") {
+            return this.assignment(r);
         }
 
         return r;
@@ -318,6 +334,7 @@ module.exports = class Parser {
 
         const vName  = this.advance("DEFINE").value;
         this.advance();
+        this.advance("ASSIGNMENT");
         const vValue = this.operation();
 
         return {

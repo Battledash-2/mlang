@@ -1,1 +1,1 @@
-util.log('hello\'s \\') // hello's \
+util.log('hello\'s') // hello's \
