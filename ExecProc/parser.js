@@ -20,7 +20,6 @@ module.exports = class Parser {
                 body.push(adv);
             } while (this.next?.type == "EXPR_END" && this.advance("EXPR_END") && this.next?.type != "BCLOSE");
             if (this.next?.type != "BCLOSE" && this.next != null) {
-                console.log('next', this.next)
                 loop();
             }
         }
