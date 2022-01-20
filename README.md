@@ -13,6 +13,7 @@
 - [x] FIXED: Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (This will still happen if you do something like `let a = 5 -a`)
 
 ## To-Do (in order from Most Important to Least Important)
+- [ ] Operations like `varName += 5`
 - [ ] Scopes
 - [ ] For & (Do)? While Loop
 
