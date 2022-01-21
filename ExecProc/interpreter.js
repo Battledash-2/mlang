@@ -298,16 +298,11 @@ module.exports = class Interpreter {
 			this.pos = node;
 			let value;
 			if (this.userFunctions.hasOwnProperty(node.value)) {
-				value = {
-					type: "DEFINEF",
-					body: {
-						type: "BLOCK",
-						body: this.userFunctions[node.value],
-					},
-					position: this.pos.position,
-				};
+				value = node.value
+				node.isfunc = true
 			} else {
 				value = this.getVar(node.value, errorOnUndefined);
+				node.isfunc = false
 			}
 			return {
 				type: node.type,
