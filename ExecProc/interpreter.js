@@ -297,12 +297,13 @@ module.exports = class Interpreter {
 		if (node?.type == "IDENTIFIER") {
 			this.pos = node;
 			let value;
+			let isfunc
 			if (this.userFunctions.hasOwnProperty(node.value)) {
 				value = node.value
-				const isfunc = true
+				isfunc = true
 			} else {
 				value = this.getVar(node.value, errorOnUndefined);
-				const isfunc = false
+				isfunc = false
 			}
 			return {
 				type: node.type,
