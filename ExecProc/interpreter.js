@@ -311,6 +311,7 @@ module.exports = class Interpreter {
 			}
 			return {
 				type: node.type,
+				name: node.value,
 				value: value,
 				position: node.position,
 			};
