@@ -352,7 +352,7 @@ module.exports = class Parser {
         const body = [];
         const loop=()=>{
             do {
-                let adv = this.variableExpression();
+                const adv = this.variableExpression();
                 body.push(adv);
             } while (this.next?.type == "EXPR_END" && this.advance("EXPR_END"));
             if (this.next != null) {

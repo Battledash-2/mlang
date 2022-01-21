@@ -75,10 +75,7 @@ module.exports = class Interpreter {
 		if (this.varExists(name)) {
 			return this.variables[name];
 		}
-		if (withError)
-			throw new Error(
-				`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
-			);
+		if (withError) throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
 	}
 
 	deleteVar(name, withError = true) {
