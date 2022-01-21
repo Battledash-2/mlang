@@ -13,7 +13,7 @@ if (mode == null) {
         if (fs.existsSync(filename)) {
             // console.log(String(fs.readFileSync(filename)));
             const filecontent = String(fs.readFileSync(filename));
-            const result      = new ExecProc(filecontent, filename, filename.toLowerCase().startsWith("c:") ? filename : `${__dirname}\\${filename}`);
+            const result      = new ExecProc(filecontent, filename, filename.toLowerCase().startsWith("c:") || filename.toLowerCase().startsWith("home") || filename.toLowerCase().startsWith("~") || filename.toLowerCase().startsWith("/") ? filename : `${process.cwd()}\\${filename}`);
             console.log("Result execution process: "+JSON.stringify(result, null, 4));
         } else {
             console.error(`File '${filename}' does not exist.`);
