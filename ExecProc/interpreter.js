@@ -299,14 +299,15 @@ module.exports = class Interpreter {
 			let value;
 			if (this.userFunctions.hasOwnProperty(node.value)) {
 				value = node.value
-				node.isfunc = true
+				const isfunc = true
 			} else {
 				value = this.getVar(node.value, errorOnUndefined);
-				node.isfunc = false
+				const isfunc = false
 			}
 			return {
 				type: node.type,
 				value: value,
+				isfunc: isfunc,
 				position: node.position,
 			};
 		}
