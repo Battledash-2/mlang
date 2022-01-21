@@ -53,7 +53,7 @@ module.exports = class Interpreter {
 
 			"^=": (v, o) => {this.variables[v] **= o;},
 
-            "=": (v, o) => {this.variables[v] = o;}
+			"=": (v, o) => {this.variables[v] = o;}
 		};
 
 		return this.start(ast.body);
