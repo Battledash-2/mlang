@@ -94,12 +94,7 @@ module.exports = class Interpreter {
 	}
 
 	createVar(value, name, internal = false) {
-		if (
-			!internal &&
-			name.startsWith("$") &&
-			!name.startsWith("$last") &&
-			!name.startsWith("$pid")
-		) {
+		if (!internal && name.startsWith("$") && !name.startsWith("$last") && !name.startsWith("$pid")) {
 			throw new Error(
 				`Variable names beginning with '$' are reserved for pointers. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
 			);
