@@ -23,6 +23,11 @@ module.exports = class InterpreterInterface {
         return this.interface.pos?.position;
     }
 
+    // Arguments length
+    argumentsLength(args) {
+		return (args?.value ? 1 : args?.length) || 0;
+    }
+
     // Variables
     createVariable(name="", value="") {
         this.interface.createVar(value, name, true);
@@ -59,6 +64,9 @@ module.exports = class InterpreterInterface {
     }
 
     // Conversions
+    /**
+     * TODO: Make this work
+     */
     createConversion(from="", to="", callback=(arg={value:""})=>{return false;}) {
         conversions[`${from}-${to}`] = callback;
     }
@@ -85,5 +93,11 @@ module.exports = class InterpreterInterface {
     // Tokens
     createToken(type="", value="", position={cursor:0,line:0}) {
         return this.interface.createToken(type, value, position);
+    }
+    getTokenFrom(value) { // not recommended
+        return this.interface.createToken((typeof value).toString().toUpperCase(), value, this.interface.pos?.position);
+    }
+    getTokenTypeFrom(value) {
+        return (typeof value).toString().toUpperCase();
     }
 }
