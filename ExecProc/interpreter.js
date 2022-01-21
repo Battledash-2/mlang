@@ -381,7 +381,9 @@ module.exports = class Interpreter {
 			if (!node?.file?.endsWith(".js") && fs.existsSync(node?.file)) {
 				this.importFile(node);
 			} else if (fs.existsSync(node?.file)) {
-				const userModule = require(path.join(...this.fp.replace("\\", "/").split("/").slice(0, -1).map(c=>c==""?"/":c), node?.file));
+                let p = this.fp.replace(/\\/g, "/").split("/").map(c=>c==""?"/":c);
+                p.pop();
+				const userModule = require(path.join(...p, node?.file));
 				this.implement(userModule);
 			} else if (fs.existsSync(path.join(__dirname, "core", "modules", node?.file))) {
 				const coreModule = require(path.join(
