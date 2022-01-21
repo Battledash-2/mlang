@@ -166,7 +166,7 @@ module.exports = class Parser {
         }
     }
 
-    export() { // lets just see how it looks on gh fine
+    export() {
         const exportName = this.advance("EXPORT").value;
         this.advance("IDENTIFIER");
         
