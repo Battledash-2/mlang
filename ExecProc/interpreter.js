@@ -71,14 +71,14 @@ module.exports = class Interpreter {
 		};
 	}
 
-	getVar(name, withError = true) {
+	getVar(name, withError=true) {
 		if (this.varExists(name)) {
 			return this.variables[name];
 		}
 		if (withError) throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
 	}
 
-	deleteVar(name, withError = true) {
+	deleteVar(name, withError=true) {
 		if (this.varExists(name)) {
 			delete this.variables[name];
 			return null;
@@ -253,7 +253,7 @@ module.exports = class Interpreter {
 		return null;
 	}
 
-	evaluate({ value: l }, { value: r }, operator, eou = true) {
+	evaluate({ value: l }, { value: r }, operator, eou=true) {
 		if (operator != null) {
 			if (l.type == "IDENTIFIER") {
 				l = this.getVar(l.value, eou);
@@ -271,7 +271,7 @@ module.exports = class Interpreter {
 		}
 	}
 
-	loop(node, errorOnUndefined = true) {
+	loop(node, errorOnUndefined=true) {
 		if (node?.type == "DEFINITION") {
 			this.pos = node;
 			if (this.userFunctions.hasOwnProperty(node.name)) {
