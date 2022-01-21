@@ -383,7 +383,7 @@ module.exports = class Interpreter {
 
 		if (node?.type == "IMPORT") {
 			this.pos = node;
-			if (!node?.file.endsWith(".js") && fs.existsSync(node?.file)) { // endswith first so we're not checking if it exists for nothing
+			if (!node?.file?.endsWith(".js") && fs.existsSync(node?.file)) { // endswith first so we're not checking if it exists for nothing
 				this.importFile(node);
 			} else if (fs.existsSync(node?.file)) {
 				const userModule = require(__dirname, node?.file);
