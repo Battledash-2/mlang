@@ -5,7 +5,7 @@ module.exports = class Test extends Interface {
         super(...args);
 
         this.createFunction("test::works", (arg)=>{
-            console.log(arg.value, true);
+            console.log(arg, true, this.argumentsLength(arg));
         });
     }
 }
