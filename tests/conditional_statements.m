@@ -1,7 +1,7 @@
 let hello = 'a value'
-let not = 's'
+let not = false
 
-if (true == true && not) {
+if (hello && not) {
     util.log("ok")
 } else {
     util.log('poop')

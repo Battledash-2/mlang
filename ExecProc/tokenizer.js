@@ -4,10 +4,11 @@ const specification = [
 	[/^\.?\d+\.?\d*\b/, "NUMBER"], // for digits and numbers
 
 	[/^=>/, "CONVERT"], // conversion operators (100 => km, mi)
+    
+	[/^(===?|!==?|>=?|<=?|&&|\|\|)/, "CONDITION"], // operators
 	[/^(=|\+=|-=|\*=|%=|\^=)/, "ASSIGNMENT"], // operators
 
 	[/^[\+\-\/\*\^]/, "OPERATOR"], // operators
-	[/^(===?|!==?|>=?|<=?|&&|\|\|)/, "CONDITION"], // operators
 	
 	[/^,/, "SEPERATOR"], // seperates (km, mi)
 

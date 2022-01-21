@@ -68,18 +68,18 @@ module.exports = class InterpreterInterface {
      * TODO: Make this work
      */
     createConversion(from="", to="", callback=(arg={value:""})=>{return false;}) {
-        conversions[`${from}-${to}`] = callback;
+        this.interface.conversions[`${from}-${to}`] = callback;
     }
     deleteConversion(from="", to="") {
-        delete conversions[`${from}-${to}`];
+        delete this.interface.conversions[`${from}-${to}`];
     }
     executeConversion(value=0, from="", to="") {
         if (this.interface.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)){
             return this.interface.execConvert(`${from}-${to}`, this.interface.loop(value))
-        } else if (conversions.hasOwnProperty(`${from}-${to}`)) {
+        } else if (this.interface.conversions.hasOwnProperty(`${from}-${to}`)) {
             return {
                 type: "NUMBER",
-                value: conversions[`${from}-${to}`](this.loop(value)),
+                value: this.interface.conversions[`${from}-${to}`](this.loop(value)),
                 position: {
                     cursor: "N/A",
                     line: "N/A"

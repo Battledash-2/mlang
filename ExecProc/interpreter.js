@@ -3,8 +3,6 @@ const path = require("path");
 const Tokenizer = require("./tokenizer");
 const Parser = require("./parser");
 
-const conversions = require("./core/convert");
-
 const operations = {
 	"^": (l, r) => l ** r,
 
@@ -39,9 +37,13 @@ module.exports = class Interpreter {
 		this.variables = require("./core/main")(this.createToken);
 		this.userFunctions = {}; // functions defined by user
 		this.userConversions = {};
+
 		this.exports = {};
 		this.returnExports = returnExports;
+
 		this.pos;
+
+        this.conversions = require("./core/convert");
 
 		this.assignOperations = {
 			// assignOperations[operator](variable, operation);
@@ -260,9 +262,7 @@ module.exports = class Interpreter {
 			if (operations[operator]) return operations[operator](l, r);
 			if (binOperations[operator]) return binOperations[operator](l, r);
 
-			throw new Error(
-				`Could not find operator '${operator}' internally (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`
-			);
+			throw new Error(`Could not find operator '${operator}' internally (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
 		}
 	}
 
@@ -323,23 +323,15 @@ module.exports = class Interpreter {
 
 		if (node?.type == "CONVERT") {
 			this.pos = node;
-			if (
-				this.userConversions.hasOwnProperty(
-					`${node.from?.value}-${node.to?.value}`
-				)
-			) {
+			if (this.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
 				return this.execConvert(
 					`${node.from?.value}-${node.to?.value}`,
 					this.loop(node.value)
 				);
-			} else if (
-				conversions.hasOwnProperty(
-					`${node.from?.value}-${node.to?.value}`
-				)
-			) {
+			} else if (this.conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
 				return {
 					type: "NUMBER",
-					value: conversions[`${node.from?.value}-${node.to?.value}`](
+					value: this.conversions[`${node.from?.value}-${node.to?.value}`](
 						this.loop(node.value)
 					),
 					position: node?.position,
@@ -428,24 +420,13 @@ module.exports = class Interpreter {
 
 		if (node?.type == "CONDITION") {
 			if (node?.condition?.left) {
-				if (
-					this.evaluate(
-						this.loop(node?.condition?.left, false),
-						this.loop(node?.condition?.right, false),
-						node?.condition?.operator,
-						false
-					)
-				) {
+				if (this.evaluate(this.loop(node?.condition?.left, false), this.loop(node?.condition?.right, false), node?.condition?.operator, false)) {
 					return this.start(node?.pass?.body)[0] || null;
 				} else if (node?.fail?.body != null) {
 					return this.start(node?.fail?.body)[0] || null;
 				}
 			} else {
-				if (
-					this.varExists(node?.condition?.value) ||
-					node?.condition?.value > 0 ||
-					node?.condition?.value == true
-				) {
+				if ((this.varExists(node?.condition?.value) || node?.condition?.value > 0 || node?.condition?.value == true) && !(node?.condition?.value == true || this.getVar(node?.condition?.value, false) == true)) {
 					return this.start(node?.pass?.body)[0] || null;
 				} else if (node?.fail?.body != null) {
 					return this.start(node?.fail?.body)[0] || null;
