@@ -3,6 +3,16 @@ module.exports = class InterpreterInterface {
         this.interface = interpreter;
     }
 
+	// Functional
+	pauseProcess(ms=0) {
+		const end = Date.now() + ms;
+		while (Date.now() < end) continue;
+		return true;
+	}
+	throwError(error, functionName, moduleName) {
+		throw new Error(`${error} in ${moduleName}/${functionName} ${this.errorPosition()}`);
+	}
+
 	// Imports
 	importFile(file) {
 		return this.interface.importFile({ file });
