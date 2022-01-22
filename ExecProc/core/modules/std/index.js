@@ -9,14 +9,17 @@ module.exports = class Standard extends Interface {
 		this.createFunction("std::clear", ()=>{
 			process.stdout.write("\u001bc");
 		});
+		this.createFunction("std::out::write", (arg)=>{
+			process.stdout.write(this.concatValues(arg));
+		});
 
         // main
         this.createFunction("std::log", (arg)=>{
 			let send = "";
 			if (this.argumentsLength(arg) > 1) {
-				send = arg.map(c=>Color(c)).join(" ");
+				send = arg.map(c=>Typeof(c.value) != "STRING" ? Color(c) : c?.value).join(" ");
 			} else {
-				send = Color(arg);
+				send = Typeof(arg?.value) != "STRING" ? Color(arg) : arg?.value;
 			}
 
 			console.log("\u001b[1;38;5;8mLog: \u001b[0m"+send);

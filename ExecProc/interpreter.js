@@ -232,11 +232,11 @@ module.exports = class Interpreter {
 
 		if (Array.isArray(node.arg)) {
 			arg = node.arg.map(c=>{
-				if (c.type == "IDENTIFER") {
+				if (c.type == "IDENTIFIER") {
 					return {
 						type: c.type,
-						name: c.name,
-						value: this.getVar(c.name),
+						name: c.value,
+						value: this.getVar(c.value),
 						position: c.position
 					};
 				}
@@ -505,6 +505,9 @@ module.exports = class Interpreter {
 		}
 
 		if (node != null) this.pos = node;
+		if (!node?.hasOwnProperty("type")) {
+			return {};
+		}
 
 		return {
 			type: node.type,

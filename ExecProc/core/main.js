@@ -1,18 +1,19 @@
 const Color = require("./color");
+const Typeof = require("./typeof");
 
 module.exports = (createToken)=>{
     let num = 0;
     return { // predefine functions an variables here (note: these can be overwritting by the user, although they cannot create functions)
         "util.pi": Math.PI,
         "util.enum": (_arg, _pos, caller)=>{return createToken("NUMBER", ++num, caller.position);},
-        "util.log": (arg)=>console.log(arg.value),
-		"print": (arg)=>console.log(arg.value),
+        "util.log": (arg)=>console.log(arg?.map?.(c=>c?.value).join(" ") || (arg?.value || "")),
+		"print": (arg)=>console.log(arg?.map?.(c=>c?.value).join(" ") || (arg?.value || "")),
         "printf": (arg)=>{
 			let send = "";
 			if (((arg?.value ? 1 : arg?.length) || 0) > 1) {
-				send = arg.map(c=>Color(c)).join(" ");
+				send = arg.map(c=>Typeof(c.value) != "STRING" ? Color(c) : c?.value).join(" ");
 			} else {
-				send = Color(arg);
+				send = Typeof(arg?.value) != "STRING" ? Color(arg) : arg?.value;
 			}
 
 			console.log(send);

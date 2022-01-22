@@ -58,6 +58,12 @@ module.exports = class InterpreterInterface {
 	createArgumentList(args) {
 		return [...args.map(c=>this.getTokenFrom(c))];
 	}
+	getArgumentValues(args) {
+		return args?.map?.(c=>c?.value) || [];
+	}
+	concatValues(args, sep=" ") {
+		return args?.map?.(c=>c?.value).join(sep) || (args?.value || "");
+	}
 
 	// Functions
 	isUserFunction(arg) {

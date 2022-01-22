@@ -1,4 +1,4 @@
-# MLang (v1.7.5): The Mathematics Language
+# MLang (v1.7.6): The Mathematics Language
 
 ## What is M
 
@@ -6,7 +6,7 @@
 
 ## Project Status
 
-#### Version: v1.7.5
+#### Version: v1.7.6
 - Loops
 
 ## Known Bugs
