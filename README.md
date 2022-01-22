@@ -1,10 +1,10 @@
-# MLang (v1.6.8): The Mathematics Language
+# MLang (v1.6.9): The Mathematics Language
 
 ## What is M
 #### M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, and expressions.
 
 ## Project Status
-#### Version: v1.6.8
+#### Version: v1.6.9
 - Scopes
 
 ## Known Bugs

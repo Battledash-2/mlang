@@ -43,7 +43,7 @@ module.exports = class Interpreter {
 
 		this.pos;
 
-        this.conversions = require("./core/convert");
+		this.conversions = require("./core/convert");
 
 		this.assignOperations = {
 			// assignOperations[operator](variable, operation);
@@ -296,22 +296,17 @@ module.exports = class Interpreter {
 
 		if (node?.type == "IDENTIFIER") {
 			this.pos = node;
-			let value;
-			if (this.userFunctions.hasOwnProperty(node.value)) {
-				value = {
-					type: "DEFINEF",
-					body: {
-						type: "BLOCK",
-						body: this.userFunctions[node.value],
-					},
-					position: this.pos.position,
-				};
-			} else {
-				value = this.getVar(node.value, errorOnUndefined);
+			
+			let value = node?.value;
+			if (!this.userFunctions.hasOwnProperty(value)) {
+				value = this.getVar(value, errorOnUndefined);
 			}
+
 			return {
 				type: node.type,
 				value: value,
+				valueType: value?.type || null,
+				name: node.value,
 				position: node.position,
 			};
 		}
@@ -373,8 +368,8 @@ module.exports = class Interpreter {
 			if (!node?.file?.endsWith(".js") && fs.existsSync(node?.file)) {
 				this.importFile(node);
 			} else if (fs.existsSync(node?.file)) {
-                let p = this.fp.replace(/\\/g, "/").split("/").map(c=>c==""?"/":c);
-                p.pop();
+				let p = this.fp.replace(/\\/g, "/").split("/").map(c=>c==""?"/":c);
+				p.pop();
 				const userModule = require(path.join(...p, node?.file));
 				this.implement(userModule);
 			} else if (fs.existsSync(path.join(__dirname, "core", "modules", node?.file))) {

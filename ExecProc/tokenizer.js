@@ -4,7 +4,7 @@ const specification = [
 	[/^\.?\d+\.?\d*\b/, "NUMBER"], // for digits and numbers
 
 	[/^=>/, "CONVERT"], // conversion operators (100 => km, mi)
-    
+	
 	[/^(===?|!==?|>=?|<=?|&&|\|\|)/, "CONDITION"], // operators
 	[/^(=|\+=|-=|\*=|%=|\^=)/, "ASSIGNMENT"], // operators
 
@@ -19,7 +19,7 @@ const specification = [
 	[/^\b(convert|conversion)\b/, "DEFINEC"], // define conversion
 	[/^{/, "BOPEN"], // block open 
 	[/^}/, "BCLOSE"], // block close
-
+	
 	[/^\bimport\b/, "IMPORT"],
 	[/^\bexport\b/, "EXPORT"],
 
@@ -94,42 +94,42 @@ module.exports = class Tokenizer {
 
 	nextToken() {
 		if (this.eof()) return null;
-        
-        const string = this.source.slice(this.cursor);
-        for (let [regex, type] of specification) {
-            const match = this.match(regex, string);
+		
+		const string = this.source.slice(this.cursor);
+		for (let [regex, type] of specification) {
+			const match = this.match(regex, string);
 
-            if (match == null) continue;
-            switch (type) {
-                case null:
-                    return this.nextToken();
-                case "NL":
-                    this.pos = 0;
-                    this.line++;
+			if (match == null) continue;
+			switch (type) {
+				case null:
+					return this.nextToken();
+				case "NL":
+					this.pos = 0;
+					this.line++;
 
-                    return this.nextToken();
-                case "CMNT":
-                    // const newlines = this.match(/\n+/g, match);
-                    // this.line += newlines?.length+1;
-                    // if (newlines?.length > 0) this.pos = 0;
-                    // console.log(newlines, 'n', newlines?.length);
-                    // return this.nextToken();
-                    let to = match.indexOf("*/") > -1 ? match.indexOf("*/") : 0;
-                    this.line += this.match(/\n+/g, match.slice(0, to))?.length || 0;
-                    this.pos = 0;
-                    return this.nextToken();
-            }
+					return this.nextToken();
+				case "CMNT":
+					// const newlines = this.match(/\n+/g, match);
+					// this.line += newlines?.length+1;
+					// if (newlines?.length > 0) this.pos = 0;
+					// console.log(newlines, 'n', newlines?.length);
+					// return this.nextToken();
+					let to = match.indexOf("*/") > -1 ? match.indexOf("*/") : 0;
+					this.line += this.match(/\n+/g, match.slice(0, to))?.length || 0;
+					this.pos = 0;
+					return this.nextToken();
+			}
 
-            return {
-                type,
-                value: match,
-                position: {
-                    cursor: this.pos-(match.length-1),
-                    line: this.line+1
-                }
-            };
-        }
+			return {
+				type,
+				value: match,
+				position: {
+					cursor: this.pos-(match.length-1),
+					line: this.line+1
+				}
+			};
+		}
 
-        throw new Error(`Unexpected token '${string.slice(0, 1)}' at ${this.fn}:${this.line+1}:${this.pos+1}`);
+		throw new Error(`Unexpected token '${string.slice(0, 1)}' at ${this.fn}:${this.line+1}:${this.pos+1}`);
 	}
 }
