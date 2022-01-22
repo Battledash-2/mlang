@@ -1,15 +1,15 @@
-# MLang (v1.6.9): The Mathematics Language
+# MLang (v1.7.0): The Mathematics Language
 
 ## What is M
 #### M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, and expressions.
 
 ## Project Status
-#### Version: v1.6.9
+#### Version: v1.7.0
 - Scopes
 
 ## Known Bugs
 - [ ] PENDING: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`)
-- [x] FIXED: Nothing is working?? (Cause: This bug seems to be caused by the new feature which makes it possible for expressions to be split with `;`)
+- [x] FIXED: Unknown bug (Cause: This bug seems to be caused by the new feature which makes it possible for expressions to be split with `;`)
 - [x] FIXED: Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (This will still happen if you do something like `let a = 5 -a`)
 
 ## To-Do (in order from Most Important to Least Important)

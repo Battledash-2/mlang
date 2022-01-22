@@ -3,6 +3,24 @@ module.exports = class InterpreterInterface {
         this.interface = interpreter;
     }
 
+	// Imports
+	importFile(file) {
+		return this.interface.importFile({ file });
+	}
+	importFromText(value, as="_") {
+		const tokens = new Tokenizer(value, "import", "import");
+		const ast = new Parser(tokens, "import", "import");
+		const exports = new Interpreter(ast, "import", "import", true);
+
+		Object.entries(exports).forEach(([ name, value ]) => {
+			if (value.type === "DEFINEF") {
+				this.userFunctions[as + "::" + name] = value.body;
+			} else {
+				this.variables[as + "::" + name] = value.value;
+			}
+		});
+	}
+
     // For error logging
     errorPosition() {
         return `(${this.getFilename()}:${this.getPosition()})`;

@@ -200,18 +200,18 @@ module.exports = class Interpreter {
 
 	importFile(node) {
 		const fileContent = fs.readFileSync(node?.file);
-		const filename = node?.file;
-		const module_name = filename.split(".", 1)[0];
+		const fileName = node?.file;
+		const moduleName = fileName.split(".", 1)[0];
 
-		const tokens = new Tokenizer(fileContent, filename, filename);
-		const ast = new Parser(tokens, filename, filename);
-		const exports = new Interpreter(ast, filename, filename, true);
+		const tokens = new Tokenizer(fileContent, fileName, fileName);
+		const ast = new Parser(tokens, fileName, fileName);
+		const exports = new Interpreter(ast, fileName, fileName, true);
 
-		Object.entries(exports).forEach(([name, value]) => {
+		Object.entries(exports).forEach(([ name, value ]) => {
 			if (value.type === "DEFINEF") {
-				this.userFunctions[module_name + "::" + name] = value.body;
+				this.userFunctions[moduleName + "::" + name] = value.body;
 			} else {
-				this.variables[module_name + "::" + name] = value.value;
+				this.variables[moduleName + "::" + name] = value.value;
 			}
 		});
 	}
