@@ -30,7 +30,7 @@ module.exports = class Parser {
 		
 		this.advance("BCLOSE");
 		return {
-			type: 'BLOCK',
+			type: "BLOCK",
 			body
 		}
 	}
@@ -215,6 +215,51 @@ module.exports = class Parser {
 		return result;
 	}
 
+	operations() {
+		let declarations = [];
+		let statement = {};
+
+		const loop=()=>{
+			do {
+				const adv = this.condition();
+				if (adv.type == "DEFINITION") {
+					declarations.push(adv);
+				} else {
+					statement = adv;
+					break;
+				}
+			} while (this.next?.type == "EXPR_END" && this.advance("EXPR_END") && this.next?.type != "RPAREN");
+			if (this.next?.type != "RPAREN" && this.next != null) {
+				loop();
+			}
+		}
+
+		if (this.advance("LPAREN").type != "BCLOSE") {
+			loop();
+		}
+		
+		this.advance("RPAREN");
+		return {
+			type: "OPERATION",
+			declarations,
+			statement
+		}
+	}
+
+	loop() {
+		const position = this.next.position;
+		this.advance("LOOP");
+		const operation = this.operations();
+		const body = this.block();
+
+		return {
+			type: "LOOP",
+			operation,
+			body,
+			position
+		};
+	}
+
 	primary() {
 		switch (this.next?.type) {
 			case "DEFINE":
@@ -241,6 +286,8 @@ module.exports = class Parser {
 				return this.boolean();
 			case "OPERATOR":
 				return this.operation();
+			case "LOOP":
+				return this.loop();
 			case "EXPR_END":
 				return null;
 			default:
@@ -365,7 +412,7 @@ module.exports = class Parser {
 		}
 		loop();
 		return {
-			type: 'program',
+			type: "program",
 			body
 		}
 	}

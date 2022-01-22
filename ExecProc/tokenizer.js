@@ -20,6 +20,9 @@ const specification = [
 	[/^{/, "BOPEN"], // block open 
 	[/^}/, "BCLOSE"], // block close
 	
+	[/^\bwhile\b/, "LOOP"],
+	[/^\bbreak\b/, "BREAK"],
+
 	[/^\bimport\b/, "IMPORT"],
 	[/^\bexport\b/, "EXPORT"],
 

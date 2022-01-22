@@ -1,4 +1,4 @@
-# MLang (v1.7.2): The Mathematics Language
+# MLang (v1.7.5): The Mathematics Language
 
 ## What is M
 
@@ -6,8 +6,8 @@
 
 ## Project Status
 
-#### Version: v1.7.2
--   Scopes
+#### Version: v1.7.5
+- Loops
 
 ## Known Bugs
 - [ ] PENDING: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`)
@@ -15,15 +15,15 @@
 - [x] FIXED: Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (This will still happen if you do something like `let a = 5 -a`)
 
 ## To-Do (in order from Most Important to Least Important)
-- [ ] Scopes
-- [ ] For & (Do)? While Loop
+- [ ] Scopes [***HIGH* PRIORITY**]
 
 - [ ] HTTP Module (Possible, but unexpected)
 
-## Canceled Ideas (maybe in the future?)
+## Scrapped Ideas (maybe in the future?)
 - [ ] Arrays (Priority: HIGH)
 
 ## Done
+- [x] While loops
 - [x] Operations like `varName += 5`
 - [x] Better `import`/`export`
 - [x] Multiple arguments in functions (util.arg, util.arg1, util.arg2 || $pid, $pid1, $pid2)

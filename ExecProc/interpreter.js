@@ -220,11 +220,21 @@ module.exports = class Interpreter {
 		const fname = node.name.value;
 		let idname, arg;
 		if (node.arg && node.arg.type == "IDENTIFIER") {
-			idname = node.arg.value;
+			idname = node.arg.name;
 		}
 
 		if (Array.isArray(node.arg)) {
-			arg = node.arg;
+			arg = node.arg.map(c=>{
+				if (c.type == "IDENTIFER") {
+					return {
+						type: c.type,
+						name: c.name,
+						value: this.getVar(c.name),
+						position: c.position
+					};
+				}
+				return c;
+			});
 		} else {
 			arg = node.arg != null ? this.loop(node.arg) : node.arg;
 		}
@@ -266,7 +276,48 @@ module.exports = class Interpreter {
 		}
 	}
 
+	conditionPass(node) {
+		if (node?.left) {
+			if (this.evaluate(this.loop(node?.left, false), this.loop(node?.right, false), node?.operator, false)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			if ((this.varExists(node?.value) || node?.value > 0 || node?.value == true) && !(node?.value == true || this.getVar(node?.value, false) == true)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	condition(node) {
+		if (node?.condition?.left) {
+			if (this.evaluate(this.loop(node?.condition?.left, false), this.loop(node?.condition?.right, false), node?.condition?.operator, false)) {
+				return this.start(node?.pass?.body)[0] || null;
+			} else if (node?.fail?.body != null) {
+				return this.start(node?.fail?.body)[0] || null;
+			}
+		} else {
+			if ((this.varExists(node?.condition?.value) || node?.condition?.value > 0 || node?.condition?.value == true) && !(node?.condition?.value == true || this.getVar(node?.condition?.value, false) == true)) {
+				return this.start(node?.pass?.body)[0] || null;
+			} else if (node?.fail?.body != null) {
+				return this.start(node?.fail?.body)[0] || null;
+			}
+		}
+		return null;
+	}
+
 	loop(node, errorOnUndefined=true) {
+		if (node?.type == "BREAK") {
+			return {
+				type: "BREAK",
+				position: node?.position
+			}
+		}
+
 		if (node?.type == "DEFINITION") {
 			this.pos = node;
 			if (this.userFunctions.hasOwnProperty(node.name)) {
@@ -414,20 +465,7 @@ module.exports = class Interpreter {
 		}
 
 		if (node?.type == "CONDITION") {
-			if (node?.condition?.left) {
-				if (this.evaluate(this.loop(node?.condition?.left, false), this.loop(node?.condition?.right, false), node?.condition?.operator, false)) {
-					return this.start(node?.pass?.body)[0] || null;
-				} else if (node?.fail?.body != null) {
-					return this.start(node?.fail?.body)[0] || null;
-				}
-			} else {
-				if ((this.varExists(node?.condition?.value) || node?.condition?.value > 0 || node?.condition?.value == true) && !(node?.condition?.value == true || this.getVar(node?.condition?.value, false) == true)) {
-					return this.start(node?.pass?.body)[0] || null;
-				} else if (node?.fail?.body != null) {
-					return this.start(node?.fail?.body)[0] || null;
-				}
-			}
-			return null;
+			return this.condition(node);
 		}
 
 		if (node?.type == "ASSIGN") {
@@ -439,6 +477,19 @@ module.exports = class Interpreter {
 			} else {
 				throw new Error(`Cannot assign variable '${node?.variable?.value}' without 'let' or 'var' keyword (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
 			}
+		}
+
+		if (node?.type == "LOOP") {
+			const dec = node?.operation?.declarations;
+			const sta = node?.operation?.statement;
+
+			const dow = node?.body;
+
+			this.start(dec);
+			while (this.conditionPass(sta)) {
+				if (this.start(dow?.body)[0]?.type == "BREAK") break;
+			}
+			return null;
 		}
 
 		if (node?.value != null) {
