@@ -1,11 +1,7 @@
-const blake2b = require('blake2b')
 const Path = require('path')
 const fs = require('fs')
-function toHexString(byteArray) {
-  return Array.from(byteArray, function(byte) {
-    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-  }).join('')
-}
+const crypto = require('crypto')
+
 function abspath(path){
 	return Path.normalize(Path.resolve(path))
 }
@@ -16,11 +12,7 @@ const sleep = ms => {
 
 function generateid(path){
 	path = abspath(path)
-	var hash = blake2b(16)
-	var output = new Uint8Array(16)
-	hash.update(Buffer.from(path))
-	var output = toHexString(hash.digest(output))
-	return output
+	return crypto.createHash('md5').update(path).digest('hex')
 }
 function EmptyFunc(...args){}
 class Connection {
