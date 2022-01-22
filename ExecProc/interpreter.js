@@ -145,6 +145,13 @@ module.exports = class Interpreter {
 		for (let o in node) {
 			const add = this.loop(node[o]);
 			if (add == null) continue;
+			if (add?.type == "BREAK") {
+				r.push({
+					type: add?.type,
+					position: add?.position
+				});
+				break;
+			};
 			r.push(add);
 		}
 		if (this.returnExports) {
