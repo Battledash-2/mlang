@@ -238,7 +238,7 @@ module.exports = class Interpreter {
 
 	assign(variable, operation, operator) {
 		if (!operation.hasOwnProperty("left")) {
-			operation = operation?.value;
+			operation = this.loop(operation)?.value;
 		} else {
 			operation = this.evaluate(
 				this.loop(operation?.left),

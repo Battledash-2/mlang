@@ -13,7 +13,7 @@ module.exports = class Parser {
 	
 	block() {
 		const body = [];
-		this.advance("BOPEN");
+
 		const loop=()=>{
 			do {
 				const adv = this.variableExpression();
@@ -23,7 +23,11 @@ module.exports = class Parser {
 				loop();
 			}
 		}
-		loop();
+
+		if (this.advance("BOPEN").type != "BCLOSE") {
+			loop();
+		}
+		
 		this.advance("BCLOSE");
 		return {
 			type: 'BLOCK',
