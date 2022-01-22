@@ -10,9 +10,9 @@ module.exports = class InterpreterInterface {
 	importFromText(value, as="_") {
 		const tokens = new Tokenizer(value, "import", "import");
 		const ast = new Parser(tokens, "import", "import");
-		const exports = new Interpreter(ast, "import", "import", true);
+		const exported = new Interpreter(ast, "import", "import", true);
 
-		Object.entries(exports).forEach(([ name, value ]) => {
+		Object.entries(exported).forEach(([ name, value ]) => {
 			if (value.type === "DEFINEF") {
 				this.userFunctions[as + "::" + name] = value.body;
 			} else {

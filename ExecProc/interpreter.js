@@ -205,9 +205,9 @@ module.exports = class Interpreter {
 
 		const tokens = new Tokenizer(fileContent, fileName, fileName);
 		const ast = new Parser(tokens, fileName, fileName);
-		const exports = new Interpreter(ast, fileName, fileName, true);
+		const exported = new Interpreter(ast, fileName, fileName, true);
 
-		Object.entries(exports).forEach(([ name, value ]) => {
+		Object.entries(exported).forEach(([ name, value ]) => {
 			if (value.type === "DEFINEF") {
 				this.userFunctions[moduleName + "::" + name] = value.body;
 			} else {
