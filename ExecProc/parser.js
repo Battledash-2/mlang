@@ -202,7 +202,7 @@ module.exports = class Parser {
 	boolean() {
 		const result = {
 			type: "BOOLEAN",
-			value: Boolean(this.next.value),
+			value: this.next.value == "false" ? false : true,
 			position: this.next.position
 		}
 		if (this.advance("BOOLEAN")?.type == "CONVERT") {

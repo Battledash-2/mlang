@@ -5,7 +5,7 @@ import "std"
 std::log("Color coding the terminal!\n")
 
 util.log(cmd::bold(cmd::rgb("this is colored", 28, 182, 92)))
-cmd::write(cmd::reset("")) // `util.log` is formatted, so it will put a newline after
+cmd::write(cmd::reset("")) // `util.log` is formatted, so it will put a newline after (cmd/write is also a duplicate of process/out/write)
 util.log(cmd::bold(cmd::hex("hex coloring!", "#333")) + cmd::reset())
 
 std::log("Not feeling like presets?\n")

@@ -1,10 +1,22 @@
+const Color = require("./color");
+
 module.exports = (createToken)=>{
     let num = 0;
     return { // predefine functions an variables here (note: these can be overwritting by the user, although they cannot create functions)
         "util.pi": Math.PI,
         "util.enum": (_arg, _pos, caller)=>{return createToken("NUMBER", ++num, caller.position);},
         "util.log": (arg)=>console.log(arg.value),
-        "print": (arg)=>console.log(arg.value),
+		"print": (arg)=>console.log(arg.value),
+        "printf": (arg)=>{
+			let send = "";
+			if (((arg?.value ? 1 : arg?.length) || 0) > 1) {
+				send = arg.map(c=>Color(c)).join(" ");
+			} else {
+				send = Color(arg);
+			}
+
+			console.log(send);
+		},
         "util.sin": (arg, pos)=>createToken("NUMBER", Math.sin(arg.value), pos.position),
         "util.cosin": (arg, pos)=>createToken("NUMBER", Math.cos(arg.value), pos.position),
         "util.len": (arg, pos)=>createToken("NUMBER", String(arg.value).length, pos.position),

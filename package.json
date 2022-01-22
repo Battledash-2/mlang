@@ -1,17 +1,24 @@
 {
-  "name": "mlang",
-  "version": "1.7.0",
-  "description": "M Lang - The Arithmetic Language: M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, built-in functions and expressions.",
-  "main": "index.js",
-  "scripts": {
-    "example": "node . -f example.m",
-    "test": "node . -f ./tests/functions.m",
-    "start": "node . -c"
-  },
-  "repository": {
-      "url": "https://github.com/Battledash-2/mlang"
-  },
-  "keywords": ["nodejs", "interpreter", "language", "parser", "lexer", "tokenizer"],
-  "author": "Battledash-2",
-  "license": "MIT"
+	"name": "mlang",
+	"version": "1.7.1",
+	"description": "M Lang - The Arithmetic Language: M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, built-in functions and expressions.",
+	"main": "index.js",
+	"scripts": {
+		"example": "node . -f example.m",
+		"test": "node . -f ./tests/functions.m",
+		"start": "node . -c"
+	},
+	"repository": {
+		"url": "https://github.com/Battledash-2/mlang"
+	},
+	"keywords": [
+		"nodejs",
+		"interpreter",
+		"language",
+		"parser",
+		"lexer",
+		"tokenizer"
+	],
+	"author": "Battledash-2",
+	"license": "MIT"
 }

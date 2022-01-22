@@ -36,7 +36,7 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
             interface.question("\u001b[1;97mmlang \u001b[1;31m$ \u001b[0m", (response)=>{
                 if (isExit(response)) {
                     interface.close();
-                    console.log("\033c"); // clears console
+                    process.stdout.write("\033c"); // clears console
                     return;
                 }
 
