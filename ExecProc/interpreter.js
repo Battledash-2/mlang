@@ -620,7 +620,8 @@ module.exports = class Interpreter {
 			// console.log(node?.array?.type) // fcall
 			let arr;
 			if (node?.array?.type == "FCALL") {
-				arr = this.fcall(node?.array).values;
+				const result = this.fcall(node?.array);
+				arr = result?.values ?? result?.value;
 			} else {
 				arr = this.loop(node?.array).value;
 			}
