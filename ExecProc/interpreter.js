@@ -6,6 +6,8 @@ const Scope = require("./scope");
 const Tokenizer = require("./tokenizer");
 const Parser = require("./parser");
 
+const Typeof = require("./core/typeof");
+
 const operations = {
 	"^": (l, r) => l ** r,
 
@@ -14,8 +16,7 @@ const operations = {
 
 	"+": (l, r) => l + r,
 	"-": (l, r) => l - r,
-};
-
+}
 const binOperations = {
 	"==": (l, r) => l == r,
 	"===": (l, r) => l === r,
@@ -448,7 +449,7 @@ module.exports = class Interpreter {
 			return {
 				type: node.type,
 				value: value,
-				valueType: value?.type || null,
+				valueType: Typeof(value) || null,
 				name: node.value,
 				position: node.position,
 			};

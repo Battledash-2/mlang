@@ -187,11 +187,7 @@ module.exports = class InterpreterInterface {
 		delete this.interface.conversions[`${from}-${to}`];
 	}
 	executeConversion(value = 0, from = "", to = "") {
-		if (
-			this.interface.userConversions.hasOwnProperty(
-				`${node.from?.value}-${node.to?.value}`
-			)
-		) {
+		if (this.interface.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
 			return this.interface.execConvert(
 				`${from}-${to}`,
 				this.interface.loop(value)
@@ -239,9 +235,24 @@ module.exports = class InterpreterInterface {
 
 	// Types
 	typeAssert(type, arg) {
-		return arg?.type === type;
+		return arg?.type === type || Typeof(arg?.value) === type;
 	}
 	typeAssertError(type, arg, fname, mname) {
+		if (arg?.type !== type && Typeof(arg?.value) !== type) {
+			console.log(arg)
+			this.throwError(
+				`Expected type '${type}', received '${arg?.type || "none"}'`,
+				fname,
+				mname
+			);
+		}
+		return true;
+	}
+
+	typeAssertStrict(type, arg) {
+		return arg?.type == type;
+	}
+	typeAssertStrictError(type, arg, fname, mname) {
 		if (arg?.type !== type) {
 			this.throwError(
 				`Expected type '${type}', received '${arg?.type || "none"}'`,
