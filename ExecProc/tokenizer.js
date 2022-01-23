@@ -30,10 +30,10 @@ const specification = [
 	[/^\belse\b/, "CONDITIONAL_ELSE"], // booleans (for operations)
 	[/^\b(true|false)\b/, "BOOLEAN"], // booleans (for operations)
 
+	[/^("|')((?:\\\1|(?:(?!\1).))*)\1|^`((?:\\`|(?:(?!`))[\s\S])*)`/, "STRING"],
+
 	[/^\b(var|let)\b/, "DEFINE"], // variable definition keywords (there is no such thing as a constant, nor a scope)
 	[/^[a-zA-Z_$](\w|\.|\:)*\b/, "IDENTIFIER"], // identifiers like variable names and referencing variables (also in use for conversions)
-
-	[/^("|')((?:\\\1|(?:(?!\1).))*)\1/, "STRING"],
 
 	[/^\n/, "NL"], // new line for error messaging
 	[/^\s/, null], // whitespace 
@@ -117,10 +117,15 @@ module.exports = class Tokenizer {
 					// if (newlines?.length > 0) this.pos = 0;
 					// console.log(newlines, 'n', newlines?.length);
 					// return this.nextToken();
-					let to = match.indexOf("*/") > -1 ? match.indexOf("*/") : 0;
-					this.line += this.match(/\n+/g, match.slice(0, to))?.length || 0;
+					var to = match.indexOf("*/") > -1 ? match.indexOf("*/") : 0;
+					this.line += match.slice(0, to).match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
 					this.pos = 0;
 					return this.nextToken();
+				case "STRING":
+					var to = match.indexOf("*/") > -1 ? match.indexOf("*/") : 0;
+					this.line += match.slice(1).match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
+					this.pos = 0;
+					break;
 			}
 
 			return {
