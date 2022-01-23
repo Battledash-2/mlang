@@ -24,7 +24,7 @@ module.exports = (createToken)=>{
 		"util.len": (arg, pos)=>createToken("NUMBER", arg.value.length, pos.position),
         "util.strlen": (arg, pos)=>createToken("NUMBER", String(arg.value).length, pos.position),
         "util.has": (args, pos)=>createToken("BOOLEAN", args[0].value.includes(args[1].value), pos.position),
-        "util.typeof": (arg, pos)=>createToken("STRING", arg.type, pos.position),
+        "util.typeof": (arg, pos)=>createToken("STRING", arg?.type ?? "NULL", pos.position),
         // ...require("./convert")(createToken)
     }
 };

@@ -626,7 +626,8 @@ module.exports = class Interpreter {
 			}
 
 			if (pos in arr) {
-				return this.loop(arr[pos]);
+				const res = this.loop(arr[pos]);
+				return res?.hasOwnProperty("type") ? res : {type:"NULL",value:""};
 			} else {
 				return null;
 			}
