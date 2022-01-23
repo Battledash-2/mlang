@@ -1,4 +1,4 @@
-# MLang (v1.7.6): The Mathematics Language
+# MLang (v1.8.0): The Mathematics Language
 
 ## What is M
 
@@ -6,8 +6,8 @@
 
 ## Project Status
 
-#### Version: v1.7.6
-- Loops
+#### Version: v1.8.0
+- Working on: String utilities (with regex support)
 
 ## Known Bugs
 - [ ] PENDING: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`)
@@ -17,12 +17,11 @@
 ## To-Do (in order from Most Important to Least Important)
 - [ ] Scopes [***HIGH* PRIORITY**]
 
-- [ ] HTTP Module (Possible, but unexpected)
-
 ## Scrapped Ideas (maybe in the future?)
 - [ ] Arrays (Priority: HIGH)
 
 ## Done
+- [x] HTTP Module (Possible, but unexpected)
 - [x] While loops
 - [x] Operations like `varName += 5`
 - [x] Better `import`/`export`
