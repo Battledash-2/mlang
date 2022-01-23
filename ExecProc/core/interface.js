@@ -126,6 +126,16 @@ module.exports = class InterpreterInterface {
     createFunction(name="", callback=(arg={value:""})=>{return false;}) {
         this.interface.variables[name] = callback;
     }
+	deleteUserFunction(name="") {
+		delete this.interface.userFunctions[name];
+	}
+	deleteBuiltInFunction(name="") {
+		delete this.interface.variables[name];
+	}
+	deleteFunction(name="") {
+		if (this.isBuiltInFunction(name)) return this.deleteBuiltInFunction(name);
+		return this.deleteUserFunction(name);
+	}
     executeFunction(name="", argument={type:"",value:0,position:{line:0,cursor:0}}) {
         return this.interface.fcall({
             name: {
