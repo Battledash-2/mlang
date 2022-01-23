@@ -26,7 +26,19 @@ module.exports = class StringUtil extends Interface {
                 this.typeAssertError("STRING", stmo, "at", "string");
                 this.typeAssertError("NUMBER", char, "at", "string");
                 
-                return this.createToken("STRING", stmo[char?.value] || "", this.getPositionObject());
+                return this.createToken("STRING", stmo.charAt(char?.value) || "", this.getPositionObject());
+            },
+
+			"codeat": (args)=>{
+                this.expectArguments(2, args, "codeat", "string", true);
+                
+                const stmo = this.getArgumentObjectAt(args, 0);
+                const char = this.getArgumentObjectAt(args, 1);
+                
+                this.typeAssertError("STRING", stmo, "at", "string");
+                this.typeAssertError("NUMBER", char, "at", "string");
+                
+                return this.createToken("STRING", stmo.charCodeAt(char?.value) || 0, this.getPositionObject());
             },
             
             "slice": (args)=>{
