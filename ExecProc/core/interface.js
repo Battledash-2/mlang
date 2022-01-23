@@ -76,7 +76,7 @@ module.exports = class InterpreterInterface {
 			return args?.value;
 		} else {
 			if (argLen < pos) return null;
-			return arg[pos]?.value;
+			return args[pos]?.value;
 		}
 	}
 	getArgumentObjectAt(args, pos=0) {
