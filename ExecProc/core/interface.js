@@ -52,6 +52,11 @@ module.exports = class InterpreterInterface {
     }
 
     // Arguments
+	expectArguments(amount=1, args, functionName="N/A", moduleName="N/A", allowMore) {
+		if (allowMore && this.argumentsLength(args) >= amount) return true;
+		if (this.argumentsLength(args) !== amount) this.throwError(`Expected ${amount} arguments, received ${this.argumentsLength(args)}`, functionName, moduleName);
+	}
+
     argumentsLength(args) {
 		return (args?.value ? 1 : args?.length) || 0;
     }
@@ -70,7 +75,16 @@ module.exports = class InterpreterInterface {
 			return args?.value;
 		} else {
 			if (argLen < pos) return null;
-			return argLen[pos];
+			return arg[pos]?.value;
+		}
+	}
+	getArgumentObjectAt(args, pos=0) {
+		const argLen = this.argumentsLength(args);
+		if (pos === 0 && argLen === 1) {
+			return args;
+		} else {
+			if (argLen < pos || args[pos] == null) return null;
+			return args[pos];
 		}
 	}
 
