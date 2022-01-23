@@ -140,6 +140,11 @@ module.exports = class Interpreter {
 		);
 	}
 
+	looseVar(varName, err=true) {
+		if (this.userFunctions.hasOwnProperty(varName)) return varName;
+		return this.getVar(varName, err);
+	}
+
 	start(node) {
 		let r = [];
 		for (let o in node) {
@@ -236,7 +241,7 @@ module.exports = class Interpreter {
 					return {
 						type: c.type,
 						name: c.value,
-						value: this.getVar(c.value),
+						value: this.looseVar(c.value),
 						position: c.position
 					};
 				}
