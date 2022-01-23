@@ -64,6 +64,15 @@ module.exports = class InterpreterInterface {
 	concatValues(args, sep=" ") {
 		return args?.map?.(c=>c?.value).join(sep) || (args?.value || "");
 	}
+	getArgumentAt(args, pos=0) {
+		const argLen = this.argumentsLength(args);
+		if (pos === 0 && argLen === 1) {
+			return args?.value;
+		} else {
+			if (argLen < pos) return null;
+			return argLen[pos];
+		}
+	}
 
 	// Functions
 	isUserFunction(arg) {
