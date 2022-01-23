@@ -176,4 +176,15 @@ module.exports = class InterpreterInterface {
     getTokenTypeFrom(value) {
         return Typeof(value).toString().toUpperCase();
     }
+
+	// Types
+	typeAssert(type, arg) {
+		return arg?.type === type;
+	}
+	typeAssertError(type, arg, fname, mname) {
+		if (arg?.type !== type) {
+			this.throwError(`Expected type '${type}', received '${arg?.type || "none"}`, fname, mname);
+		}
+		return true;
+	}
 }
