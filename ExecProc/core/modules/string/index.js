@@ -35,7 +35,7 @@ module.exports = class StringUtil extends Interface {
                 const stmo = this.getArgumentObjectAt(args, 0);
                 
                 const si1 = this.getArgumentObjectAt(args, 1);
-                const si2 = this.getArgumentObjectAt(args, 2);
+                const si2 = this.getArgumentObjectAt(args, 2) || stmo?.value?.length;
                 
                 this.typeAssertError("STRING", stmo, "index", "string");
                 this.typeAssertError("NUMBER", si1, "index", "string");
@@ -50,7 +50,7 @@ module.exports = class StringUtil extends Interface {
 				const stmo = this.getArgumentObjectAt(args, 0);
 				
 				const si1 = this.getArgumentObjectAt(args, 1);
-				const si2 = this.getArgumentObjectAt(args, 2);
+				const si2 = this.getArgumentObjectAt(args, 2) || stmo?.value?.length;
 				
 				this.typeAssertError("STRING", stmo, "index", "string");
 				this.typeAssertError("NUMBER", si1, "index", "string");
