@@ -174,13 +174,7 @@ module.exports = class InterpreterInterface {
 	}
 
 	// Conversions
-	createConversion(
-		from = "",
-		to = "",
-		callback = (arg = { value: "" }) => {
-			return false;
-		}
-	) {
+	createConversion(from = "", to = "", callback = (arg = { value: "" }) => {return false;}) {
 		this.interface.conversions[`${from}-${to}`] = callback;
 	}
 	deleteConversion(from = "", to = "") {
