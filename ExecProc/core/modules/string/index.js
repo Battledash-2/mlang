@@ -59,7 +59,7 @@ module.exports = class StringUtil extends Interface {
 				return this.createToken("STRING", stmo?.value.substring(si1?.value, si2?.value), this.getPositionObject());
 			},
 
-			"substr": (...args)=>{stringFunctions["substring"](...args)},
+			"substr": (...args)=>stringFunctions["substring"](...args),
             
             "match": (args)=>{
                 this.expectArguments(2, args, "match", "string", true); // spec
