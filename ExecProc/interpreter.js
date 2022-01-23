@@ -80,7 +80,7 @@ module.exports = class Interpreter {
 
 	getVar(name, withError = true) {
 		if (this.varExists(name)) {
-			return this.local[name]?.value ?? this.local[name];
+			return this.local[name]?.value ?? (this.local[this.local[name]?.ref]?.value ?? this.local[name]);
 		}
 		if (withError) throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
 	}
