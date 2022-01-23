@@ -4,5 +4,5 @@ let not = false
 if (hello && not) {
     util.log("ok")
 } else {
-    util.log('poop')
+    util.log('poop') // should run
 }

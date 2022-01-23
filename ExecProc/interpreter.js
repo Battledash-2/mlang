@@ -1,5 +1,8 @@
 const fs = require("fs");
 const path = require("path");
+
+const Scope = require("./scope");
+
 const Tokenizer = require("./tokenizer");
 const Parser = require("./parser");
 
@@ -34,8 +37,10 @@ module.exports = class Interpreter {
 		this.fn = fn;
 		this.fp = fp;
 
-		this.variables = require("./core/main")(this.createToken);
-		this.userFunctions = {}; // functions defined by user
+		this.global = require("./core/main")(this.createToken);
+		this.local = new Scope(this.global);
+        
+        this.userFunctions = {}; // functions defined by user
 		this.userConversions = {};
 
 		this.exports = {};
@@ -47,15 +52,15 @@ module.exports = class Interpreter {
 
 		this.assignOperations = {
 			// assignOperations[operator](variable, operation);
-			"+=": (v, o) => {this.variables[v] += o;},
-			"-=": (v, o) => {this.variables[v] -= o;},
+			"+=": (v, o) => {this.local[v] += o;},
+			"-=": (v, o) => {this.local[v] -= o;},
 
-			"%=": (v, o) => {this.variables[v] %= o;},
-			"*=": (v, o) => {this.variables[v] *= o;},
+			"%=": (v, o) => {this.local[v] %= o;},
+			"*=": (v, o) => {this.local[v] *= o;},
 
-			"^=": (v, o) => {this.variables[v] **= o;},
+			"^=": (v, o) => {this.local[v] **= o;},
 
-			"=": (v, o) => {this.variables[v] = o;}
+			"=": (v, o) => {this.local[v] = o;}
 		};
 
 		return this.start(ast.body);
@@ -75,14 +80,14 @@ module.exports = class Interpreter {
 
 	getVar(name, withError=true) {
 		if (this.varExists(name)) {
-			return this.variables[name];
+			return this.local[name];
 		}
 		if (withError) throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
 	}
 
 	deleteVar(name, withError=true) {
 		if (this.varExists(name)) {
-			delete this.variables[name];
+			delete this.local[name];
 			return null;
 		}
 		if (withError)
@@ -92,7 +97,7 @@ module.exports = class Interpreter {
 	}
 
 	varExists(name) {
-		return this.variables[name] == null ? false : true;
+		return this.local[name] == null ? false : true;
 	}
 
 	createVar(value, name, internal = false) {
@@ -106,15 +111,15 @@ module.exports = class Interpreter {
 				`Variables names with '::' are restricted for modules only. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
 			);
 		}
-		this.variables["util.last"] = value;
-		if (!this.variables["$last"]) {
+		this.local["util.last"] = value;
+		if (!this.local["$last"]) {
 			this.setPointer("last", name);
 		}
-		this.variables[name] = value;
+		this.local[name] = value;
 	}
 
 	setPointer(pointer, name) {
-		Object.defineProperty(this.variables, "$" + pointer, {
+		Object.defineProperty(this.local, "$" + pointer, {
 			configurable: true,
 			get() {
 				return this[name];
@@ -125,14 +130,18 @@ module.exports = class Interpreter {
 		});
 	}
 	deletePointer(pointer) {
-		delete this.variables["$" + pointer];
+		delete this.local["$" + pointer];
 	}
 
 	execConvert(fname, arg) {
 		if (this.userConversions[fname]) {
-			this.createVar(arg?.value, "util.arg");
-			const result = this.start(this.userConversions[fname])[0] || null;
+			this.local = new Scope(this.local);
+
+			this.createVar(arg?.value, "util.arg", true);
+			const result = this.start(this.userConversions[fname], false)[0] || null;
 			this.deleteVar("util.arg", false);
+            
+			this.local = this.local["%PAR"];
 			return result;
 		}
 		throw new Error(
@@ -145,7 +154,9 @@ module.exports = class Interpreter {
 		return this.getVar(varName, err);
 	}
 
-	start(node) {
+	start(node, newScope=true) {
+        if (newScope === true) this.local = new Scope(this.local);
+
 		let r = [];
 		for (let o in node) {
 			const add = this.loop(node[o]);
@@ -159,6 +170,8 @@ module.exports = class Interpreter {
 			};
 			r.push(add);
 		}
+        
+        if (newScope === true) this.local = this.local["%PAR"];
 		if (this.returnExports) {
 			return this.exports;
 		} else {
@@ -168,6 +181,8 @@ module.exports = class Interpreter {
 
 	execFunc(fname, arg, idname) {
 		if (this.userFunctions[fname]) {
+			this.local = new Scope(this.local);
+
 			if (Array.isArray(arg)) {
 				for (let pos in arg) {
 					let cur = arg[pos];
@@ -185,7 +200,7 @@ module.exports = class Interpreter {
 				}
 			}
 
-			const result = this.start(this.userFunctions[fname])[0] || null;
+			const result = this.start(this.userFunctions[fname], false)[0] || null;
 
 			if (Array.isArray(arg)) {
 				for (let pos in arg) {
@@ -203,6 +218,8 @@ module.exports = class Interpreter {
 					this.deletePointer("pid");
 				}
 			}
+
+			this.local = this.local["%PAR"];
 			return result;
 		}
 		throw new Error(
@@ -223,7 +240,7 @@ module.exports = class Interpreter {
 			if (value.type === "DEFINEF") {
 				this.userFunctions[moduleName + "::" + name] = value.body;
 			} else {
-				this.variables[moduleName + "::" + name] = value.value;
+				this.local[moduleName + "::" + name] = value.value;
 			}
 		});
 	}
@@ -332,6 +349,7 @@ module.exports = class Interpreter {
 
 		if (node?.type == "DEFINITION") {
 			this.pos = node;
+
 			if (this.userFunctions.hasOwnProperty(node.name)) {
 				delete this.userFunctions[node.name];
 			}
@@ -451,7 +469,7 @@ module.exports = class Interpreter {
 
 		if (node?.type == "EXPORT") {
 			let exportName = node.name;
-			if (!this.variables.hasOwnProperty(exportName)) {
+			if (!this.local.hasOwnProperty(exportName)) {
 				this.exports[exportName] = {
 					type: "DEFINEF",
 					body: this.userFunctions[exportName],

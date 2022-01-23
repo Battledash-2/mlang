@@ -336,6 +336,7 @@ module.exports = class Parser {
 		}
 
 		return {
+			type: "OPERATION",
 			...left,
 			position
 		};
@@ -371,6 +372,7 @@ module.exports = class Parser {
 		}
 
 		return {
+			type: "OPERATION",
 			...left,
 			position
 		};
