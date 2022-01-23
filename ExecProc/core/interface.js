@@ -1,3 +1,4 @@
+const Typeof = require("./typeof");
 module.exports = class InterpreterInterface {
     constructor(interpreter) {
         this.interface = interpreter;
@@ -163,9 +164,16 @@ module.exports = class InterpreterInterface {
         return this.interface.createToken(type, value, position);
     }
     getTokenFrom(value) { // not recommended
-        return this.interface.createToken((typeof value).toString().toUpperCase(), value, this.interface.pos?.position);
+        return this.interface.createToken(Typeof(value).toString().toUpperCase(), value, this.interface.pos?.position);
     }
+	getTokenListFrom(...values) {
+		let lt = values;
+		if (typeof arguments[0] == "object" && Array.isArray(arguments[0])) {
+			lt = arguments[0];
+		}
+		return lt.map(c=>this.getTokenFrom(c));		
+	}
     getTokenTypeFrom(value) {
-        return (typeof value).toString().toUpperCase();
+        return Typeof(value).toString().toUpperCase();
     }
 }
