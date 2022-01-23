@@ -26,7 +26,7 @@ module.exports = class StringUtil extends Interface {
                 this.typeAssertError("STRING", stmo, "at", "string");
                 this.typeAssertError("NUMBER", char, "at", "string");
                 
-                return this.createToken("STRING", stmo.charAt(char?.value) || "", this.getPositionObject());
+                return this.createToken("NUMBER", stmo?.value?.charAt(char?.value) || "", this.getPositionObject());
             },
 
 			"codeat": (args)=>{
@@ -38,7 +38,7 @@ module.exports = class StringUtil extends Interface {
                 this.typeAssertError("STRING", stmo, "at", "string");
                 this.typeAssertError("NUMBER", char, "at", "string");
                 
-                return this.createToken("STRING", stmo.charCodeAt(char?.value) || 0, this.getPositionObject());
+                return this.createToken("NUMBER", Number(stmo?.value?.charCodeAt(char?.value)) || 0, this.getPositionObject());
             },
             
             "slice": (args)=>{
