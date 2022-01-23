@@ -1,4 +1,4 @@
-# MLang (v1.8.5patch-1): The Mathematics Language
+# MLang (v1.8.5patch-2): The Mathematics Language
 
 ## What is M
 
@@ -6,7 +6,7 @@
 
 ## Project Status
 
-#### Version: v1.8.5patch-1
+#### Version: v1.8.5patch-2
 - Bug fix & constant variables
 
 ## Known Bugs
