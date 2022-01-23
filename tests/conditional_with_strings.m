@@ -1,5 +1,5 @@
 func isOver5Char {
-	if (util.len(util.arg) > 5) {
+	if (util.strlen(util.arg) > 5) {
 		util.log("OVER 5")
 	} else {
 		util.log("UNDER 5")
