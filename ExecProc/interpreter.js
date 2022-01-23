@@ -291,7 +291,7 @@ module.exports = class Interpreter {
 
 	evaluate({ value: l }, { value: r }, operator, eou=true) {
 		if (operator != null) {
-			if (l.type == "IDENTIFIER") {
+			if (l?.type == "IDENTIFIER") {
 				l = this.getVar(l.value, eou);
 			}
 			if (r?.type == "IDENTIFIER") {
@@ -306,10 +306,12 @@ module.exports = class Interpreter {
 	}
 
 	conditionPass(node) {
+		console.log(this.local.a, this.local)
 		if (node?.left) {
 			if (this.evaluate(this.loop(node?.left, false), this.loop(node?.right, false), node?.operator, false)) {
 				return true;
 			} else {
+				console.log('f')
 				return false;
 			}
 		} else {
@@ -377,7 +379,7 @@ module.exports = class Interpreter {
 
 		if (node?.type == "IDENTIFIER") {
 			this.pos = node;
-			
+
 			let value = node?.value;
 			if (!this.userFunctions.hasOwnProperty(value)) {
 				value = this.getVar(value, errorOnUndefined);
@@ -515,10 +517,14 @@ module.exports = class Interpreter {
 
 			const dow = node?.body;
 
-			this.start(dec);
+			this.local = new Scope(this.local);
+
+			this.start(dec, false);
 			while (this.conditionPass(sta)) {
-				if (this.start(dow?.body)[0]?.type == "BREAK") break;
+				if (this.start(dow?.body, false)[0]?.type == "BREAK") break;
 			}
+
+			this.local = this.local["%PAR"];
 			return null;
 		}
 
