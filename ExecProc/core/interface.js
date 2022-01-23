@@ -183,7 +183,7 @@ module.exports = class InterpreterInterface {
 	}
 	typeAssertError(type, arg, fname, mname) {
 		if (arg?.type !== type) {
-			this.throwError(`Expected type '${type}', received '${arg?.type || "none"}`, fname, mname);
+			this.throwError(`Expected type '${type}', received '${arg?.type || "none"}'`, fname, mname);
 		}
 		return true;
 	}
