@@ -17,6 +17,7 @@ module.exports = (ct)=>{
         "util.log": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value).join(" ") || (arg?.value || ""), true)),
 		"print": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value).join(" ") || (arg?.value || ""), true)),
         "printf": (arg)=>{
+			arg.value = typeof arg.value == "string" ? arg.value : Screen(arg.value);
 			let send = "";
 			if (((arg?.value ? 1 : arg?.length) || 0) > 1) {
 				send = arg.map(c=>Typeof(c.value) != "STRING" ? Color(c) : c?.value).join(" ");
