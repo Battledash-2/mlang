@@ -2,7 +2,11 @@ const Color = require("./color");
 const Typeof = require("./typeof");
 const Screen = require("./display_on_screen");
 
-module.exports = (createToken)=>{
+let createToken = (type, value, position)=>{type,value,position}
+
+module.exports = (ct)=>{
+	createToken = ct ?? createToken;
+
     let num = 0;
     return { // predefine functions an variables here (note: these can be overwritting by the user, although they cannot create functions)
         "util.pi": {

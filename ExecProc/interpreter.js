@@ -38,7 +38,7 @@ module.exports = class Interpreter {
 		this.fn = fn;
 		this.fp = fp;
 
-		this.global = require("./core/main")(this.createToken);
+		this.global = require("./core/main")();
 		this.local = scope ?? new Scope(this.global);
 
 		this.userFunctions = {}; // functions defined by user
@@ -70,7 +70,7 @@ module.exports = class Interpreter {
 		return new m(this);
 	}
 
-	static createToken(...args) {return this.createToken(...args)}
+	static createToken(type,value,position) {return {type,value,position}}
 
 	createToken(type, value, position) {
 		return {
