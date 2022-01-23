@@ -55,7 +55,6 @@ module.exports = class extends Interface {
 						}
 
 						this.createFunction("http::response::getheader", (arg)=>{
-							const name = this.getArgumentAt(arg, 0);
 							const header = res.getHeader(this.concatValues(arg, "-"));
 
 							if (typeof header !== "object") {
