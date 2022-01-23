@@ -115,7 +115,7 @@ module.exports = class extends Interface {
 			
 			if (!this.typeAssert("IDENTIFIER", callback) || !this.isUserFunction(callback?.name)) this.throwError("Invaild argument 1, expected pointer to FUNCTION", 'http', 'route');
 			
-			const pathRegex = RegExp(path.value)
+			const pathRegex = RegExp(path.value);
 			const name = this.getArgumentObjectAt(args, 3) ?? callback.name;
 			
 			this.paths[name] = {
