@@ -65,4 +65,4 @@ util.log(m2 => m, km) // 5
 let c = 40
 let f = c => c, f
 util.log(f)
-util.log(f => f, c) // you can't use unary expressions in a conversion (unless you set it as a variable and reference the variable instead)
+util.log(f => f, c)

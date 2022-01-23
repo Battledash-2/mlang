@@ -1,4 +1,4 @@
-# MLang (v1.8.2): The Mathematics Language
+# MLang (v1.8.3patch-1): The Mathematics Language
 
 ## What is M
 
@@ -6,11 +6,11 @@
 
 ## Project Status
 
-#### Version: v1.8.2
-- Working on: Bug (bug id nb1)
+#### Version: v1.8.3patch-1
+- Fixed bug [nb1]
 
 ## Known Bugs
-- [ ] PENDING: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`) (id nb1)
+- [x] FIXED: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`) (id nb1)
 - [x] FIXED: Unknown bug (Cause: This bug seems to be caused by the new feature which makes it possible for expressions to be split with `;`) (id _)
 - [x] FIXED: Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (This will still happen if you do something like `let a = 5 -a`) (id _)
 

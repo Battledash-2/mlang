@@ -89,10 +89,10 @@ module.exports = class Parser {
 		return result;
 	}
 
-	number() {
+	number(origin=false) {
 		let r = this.next;
 		r.value = Number(r.value);
-		if (this.advance()?.type == "CONVERT") {
+		if (this.advance()?.type == "CONVERT" && !origin) {
 			return this.convert(r);
 		};
 
@@ -260,7 +260,7 @@ module.exports = class Parser {
 		};
 	}
 
-	primary() {
+	primary(origin=false) {
 		switch (this.next?.type) {
 			case "DEFINE":
 				return this.variableExpression();
@@ -275,7 +275,7 @@ module.exports = class Parser {
 			case "STRING":
 				return this.string();
 			case "NUMBER":
-				return this.number();
+				return this.number(origin);
 			case "IMPORT":
 				return this.import();
 			case "EXPORT":
@@ -303,19 +303,24 @@ module.exports = class Parser {
 		if (this.next?.type == "OPERATOR" && this.tokens.isAddition(this.next)) {
 			op = this.next;
 			this.advance("OPERATOR");
-			num = this.primary();
+			num = this.primary(true);
 		}
 
-		if (op != null) return {
+		const res = {
 			type: "UNARY",
 			value: num,
-			operator: op.value,
+			operator: op?.value,
 			position: {
-				cursor: op.position.cursor,
-				line: op.position.line
+				cursor: op?.position?.cursor,
+				line: op?.position?.line
 			}
+		};
+
+		if (this.next?.type == "CONVERT") {
+			return this.convert(res);
 		}
 
+		if (op != null) return res;
 		return this.primary();
 	}
 
