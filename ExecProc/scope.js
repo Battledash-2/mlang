@@ -7,12 +7,9 @@ module.exports = class Scope {
                 if (typeof parentPointer[prop] !== "undefined") return parentPointer[prop]; // for some reason, hasOwnProperty doesn't work here
             },
             set: function(target, prop, value) {
-				// console.log(target, prop, value)
                 if (parentPointer[prop]) {
-					// console.log('s')
                     parentPointer[prop] = value;
                 } else {
-					// console.log("w")
                     Reflect.set(target, prop, value);
 					console.log(this, target)
                 };

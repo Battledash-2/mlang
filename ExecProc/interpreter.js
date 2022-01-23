@@ -306,12 +306,10 @@ module.exports = class Interpreter {
 	}
 
 	conditionPass(node) {
-		console.log(this.local.a, this.local)
 		if (node?.left) {
 			if (this.evaluate(this.loop(node?.left, false), this.loop(node?.right, false), node?.operator, false)) {
 				return true;
 			} else {
-				console.log('f')
 				return false;
 			}
 		} else {
