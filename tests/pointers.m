@@ -7,7 +7,7 @@ let $last = 34
 util.log(a);
 
 func test {
-	let $pid = "2022"
+	$pid = "2022"
 }
 
 let fifaversion = 0;

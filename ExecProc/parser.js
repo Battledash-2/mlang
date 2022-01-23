@@ -457,6 +457,7 @@ module.exports = class Parser {
 	variableExpression() {
 		if (this.next?.type != "DEFINE") return this.operation();
 
+		const kind = this.next?.value;
 		const vName  = this.advance("DEFINE").value;
 		this.advance();
 		this.advance("ASSIGNMENT");
@@ -466,6 +467,7 @@ module.exports = class Parser {
 			type: "DEFINITION",
 			name: vName,
 			value: vValue,
+			kind,
 			position: {
 				line: this.next?.position.line,
 				cursor: this.next?.position.cursor

@@ -5,7 +5,10 @@ const Screen = require("./display_on_screen");
 module.exports = (createToken)=>{
     let num = 0;
     return { // predefine functions an variables here (note: these can be overwritting by the user, although they cannot create functions)
-        "util.pi": Math.PI,
+        "util.pi": {
+			value: Math.PI,
+			constant: true
+		},
         "util.enum": (_arg, _pos, caller)=>{return createToken("NUMBER", ++num, caller.position);},
         "util.log": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value).join(" ") || (arg?.value || ""), true)),
 		"print": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value).join(" ") || (arg?.value || ""), true)),

@@ -52,28 +52,15 @@ module.exports = class Interpreter {
 		this.conversions = require("./core/convert");
 
 		this.assignOperations = {
-			// assignOperations[operator](variable, operation);
-			"+=": (v, o) => {
-				this.local[v] += o;
-			},
-			"-=": (v, o) => {
-				this.local[v] -= o;
-			},
+			"+=": (v, o) => {this.local[v].value += o;},
+			"-=": (v, o) => {this.local[v].value -= o;},
 
-			"%=": (v, o) => {
-				this.local[v] %= o;
-			},
-			"*=": (v, o) => {
-				this.local[v] *= o;
-			},
+			"%=": (v, o) => {this.local[v].value %= o;},
+			"*=": (v, o) => {this.local[v].value *= o;},
 
-			"^=": (v, o) => {
-				this.local[v] **= o;
-			},
+			"^=": (v, o) => {this.local[v].value **= o;},
 
-			"=": (v, o) => {
-				this.local[v] = o;
-			},
+			"=": (v, o) => {this.local[v].value = o;},
 		};
 
 		return this.start(ast.body);
@@ -93,12 +80,9 @@ module.exports = class Interpreter {
 
 	getVar(name, withError = true) {
 		if (this.varExists(name)) {
-			return this.local[name];
+			return this.local[name]?.value ?? this.local[name];
 		}
-		if (withError)
-			throw new Error(
-				`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
-			);
+		if (withError) throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
 	}
 
 	deleteVar(name, withError = true) {
@@ -116,39 +100,41 @@ module.exports = class Interpreter {
 		return this.local[name] == null ? false : true;
 	}
 
-	createVar(value, name, internal = false) {
-		if (
-			!internal &&
-			name.startsWith("$") &&
-			!name.startsWith("$last") &&
-			!name.startsWith("$pid")
-		) {
+	createVar(value, name, internal = false, constant=false) {
+		if (!internal && name.startsWith("$") && !name.startsWith("$last") && !name.startsWith("$pid")) {
 			throw new Error(
 				`Variable names beginning with '$' are reserved for pointers. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
 			);
 		}
 		if (!internal && name.includes("::")) {
 			throw new Error(
-				`Variables names with '::' are restricted for modules only. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
+				`Variables names with '::' are restricted for modules and imports only. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
 			);
 		}
-		this.local["util.last"] = value;
-		if (!this.local["$last"]) {
-			this.setPointer("last", name);
+		
+		if (this.local.hasOwnProperty(name) && this.local[name]?.constant == true) throw new Error(`Attempt to overwrite a constant variable '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+
+		if (name.startsWith("$")) {
+			this.local[this.local[name]?.ref].value = value;
+			return null;
 		}
-		this.local[name] = value;
+
+		this.local["util.last"] = {
+			constant,
+			value
+		};
+		if (!this.local.hasOwnProperty("$last")) this.setPointer("last", name);
+		this.local[name] = {
+			constant,
+			value
+		};
 	}
 
 	setPointer(pointer, name) {
-		Object.defineProperty(this.local, "$" + pointer, {
-			configurable: true,
-			get() {
-				return this[name];
-			},
-			set(value) {
-				this[name] = value;
-			},
-		});
+		this.local["$"+pointer] = {
+			ref: name,
+			constant: false
+		}
 	}
 	deletePointer(pointer) {
 		delete this.local["$" + pointer];
@@ -217,12 +203,11 @@ module.exports = class Interpreter {
 			} else {
 				this.createVar(arg?.value, "util.arg");
 				if (arg?.type == "IDENTIFIER") {
-					this.setPointer("pid", idname);
+					this.setPointer("pid", arg?.name);
 				}
 			}
 
-			const result =
-				this.start(this.userFunctions[fname], false)[0] || null;
+			const result = this.start(this.userFunctions[fname], false)[0] || null;
 
 			if (Array.isArray(arg)) {
 				for (let pos in arg) {
@@ -269,10 +254,7 @@ module.exports = class Interpreter {
 
 	fcall(node) {
 		const fname = node.name.value;
-		let idname, arg;
-		if (node.arg && node.arg.type == "IDENTIFIER") {
-			idname = node.arg.name;
-		}
+		let arg;
 
 		if (Array.isArray(node.arg)) {
 			arg = node.arg.map((c) => {
@@ -293,11 +275,12 @@ module.exports = class Interpreter {
 		if (typeof this.getVar(fname, false) == "function") {
 			return this.getVar(fname)(arg, node.arg, node);
 		} else {
-			return this.execFunc(fname, arg, idname /*node.arg, node*/);
+			return this.execFunc(fname, arg /*node.arg, node*/);
 		}
 	}
 
 	assign(variable, operation, operator) {
+		if (this.local.hasOwnProperty(variable.value) && this.local[variable.value].constant == true) throw new Error(`Attempt to overwrite a constant variable '${variable.value}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
 		if (!operation.hasOwnProperty("left")) {
 			operation = this.loop(operation)?.value;
 		} else {
@@ -307,6 +290,13 @@ module.exports = class Interpreter {
 				operation.operator
 			);
 		}
+
+		if (variable.value.startsWith("$")) {
+			// this.local[this.local[name]?.ref] = value;
+			this.assignOperations[operator](this.local[variable.value]?.ref, operation);
+			return null;
+		}
+
 		this.assignOperations[operator](variable.value, operation);
 		return null;
 	}
@@ -413,6 +403,8 @@ module.exports = class Interpreter {
 		if (node?.type == "DEFINITION") {
 			this.pos = node;
 
+			const isConst = node?.kind == "const" ? true : false;
+
 			if (this.userFunctions.hasOwnProperty(node.name)) {
 				delete this.userFunctions[node.name];
 			}
@@ -423,17 +415,21 @@ module.exports = class Interpreter {
 						this.loop(node.value.right),
 						node.value.operator
 					),
-					node.name
+					node.name,
+					false,
+					isConst
 				);
 			} else if (node.value.type == "IDENTIFIER") {
-				this.createVar(this.getVar(node.value.value), node.name);
+				this.createVar(this.getVar(node.value.value), node.name, false, isConst);
 			} else if (node.value.type == "FCALL") {
 				this.createVar(
 					this.loop(this.fcall(node.value))?.value,
-					node.name
+					node.name,
+					false,
+					isConst
 				);
 			} else {
-				this.createVar(this.loop(node.value).value, node.name);
+				this.createVar(this.loop(node.value).value, node.name, false, isConst);
 			}
 			return null;
 		}
@@ -617,7 +613,6 @@ module.exports = class Interpreter {
 
 		if (node?.type == "ARRAY_SELECT") {
 			const pos = this.loop(node?.goto).value;
-			// console.log(node?.array?.type) // fcall
 			let arr;
 			if (node?.array?.type == "FCALL") {
 				const result = this.fcall(node?.array);

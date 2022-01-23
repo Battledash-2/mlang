@@ -35,7 +35,7 @@ const specification = [
 
 	[/^("|')((?:\\\1|(?:(?!\1).))*)\1|^`((?:\\`|(?:(?!`))[\s\S])*)`/, "STRING"],
 
-	[/^\b(var|let)\b/, "DEFINE"], // variable definition keywords (there is no such thing as a constant, nor a scope)
+	[/^\b(var|let|const)\b/, "DEFINE"], // variable definition keywords (there is no such thing as a constant, nor a scope)
 	[/^[a-zA-Z_$](\w|\.|\:)*\b/, "IDENTIFIER"], // identifiers like variable names and referencing variables (also in use for conversions)
 
 	[/^\n/, "NL"], // new line for error messaging
