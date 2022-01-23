@@ -1,9 +1,9 @@
 func isOver5Char {
-    if (util.len(util.arg) > 5) {
-        util.log("OVER 5")
-    } else {
-        util.log("UNDER 5")
-    }
+	if (util.len(util.arg) > 5) {
+		util.log("OVER 5")
+	} else {
+		util.log("UNDER 5")
+	}
 }
 
 isOver5Char("poo") // no (3 chars)

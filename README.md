@@ -1,4 +1,4 @@
-# MLang (v1.8.3patch-1): The Mathematics Language
+# MLang (v1.8.5): The Mathematics Language
 
 ## What is M
 
@@ -6,8 +6,8 @@
 
 ## Project Status
 
-#### Version: v1.8.3patch-1
-- Fixed bug [nb1]
+#### Version: v1.8.5
+- Added arrays
 
 ## Known Bugs
 - [x] FIXED: Unary expressions don't work in conversions (`-23 => c, f` is read as `23 => c, f`) (id nb1)
@@ -15,6 +15,7 @@
 - [x] FIXED: Things like `let a = 5; -a` is read as `let a = 5-a` which causes an error due to 'a' being undefined. (This will still happen if you do something like `let a = 5 -a`) (id _)
 
 ## To-Do (in order from Most Important to Least Important)
+- [ ] Add options to modify a value in an array [***HIGH* PRIORITY**]
 
 ## Scrapped Ideas (maybe in the future?)
 - Nothing scrapped...

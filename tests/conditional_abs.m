@@ -1,9 +1,9 @@
 func abs {
-    if (util.arg > 0) {
-        util.arg
-    } else {
-        +util.arg
-    }
+	if (util.arg > 0) {
+		util.arg
+	} else {
+		+util.arg
+	}
 }
 
 util.log(abs(48))

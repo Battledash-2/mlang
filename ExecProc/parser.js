@@ -99,21 +99,78 @@ module.exports = class Parser {
 		return r;
 	}
 
-	arguments() {
-		this.advance("LPAREN");
+	arguments(advance=true) {
+		if (advance) this.advance("LPAREN");
 		let args = [];
 
 		do { // a do while will run at least once
 			if (this.next.type == "RPAREN") break;
 			args.push(this.operation());
 		} while (this.next?.type == "SEPERATOR" && this.advance())
-		this.advance("RPAREN");
+		if (advance) this.advance("RPAREN");
 		return args.length > 1 ? args : args[0];
 	}
 
-	fcall(n) {
-		let arg = this.arguments();
+	/*
+	assignment(value) {
+		const operator = this.next.value;
+		this.advance("ASSIGNMENT");
+		let withOp = this.operation();
+
 		return {
+			type: "ASSIGN",
+			operator,
+			variable: value,
+			operation: withOp,
+			position: value?.position
+		};
+	}*/
+
+	arraySelector(on) {
+		const pos = this.next?.position;
+		this.advance("LBRACK");
+		const goto = this.primary();
+
+		let result = {
+			type: "ARRAY_SELECT",
+			goto,
+			array: on,
+			position: pos
+		};
+
+		let adv = this.advance("RBRACK");
+		if (adv?.type == "LBRACK") {
+			return this.arraySelector(result);
+		} else if (adv?.type == "ASSIGNMENT") {
+			return this.assignment(result);
+		}
+
+		return result;
+	}
+
+	array() {
+		const pos = this.next.position;
+		this.advance("LBRACK");
+		let values = this.arguments(false);
+
+		if (!Array.isArray(values)) values = [values];
+		
+		if (this.advance("RBRACK")?.type == "LBRACK") {
+			return this.arraySelector(values);
+		}
+
+		return {
+			type: "ARRAY",
+			values,
+			position: pos
+		}
+	}
+
+	fcall(n) {
+		this.advance("LPAREN");
+		let arg = this.arguments(false);
+
+		const result = {
 			type: "FCALL",
 			name: n,
 			arg,
@@ -122,6 +179,11 @@ module.exports = class Parser {
 				cursor: arg?.position?.cursor || n.position.cursor
 			}
 		}
+
+		if (this.advance("RPAREN")?.type == "LBRACK") {
+			return this.arraySelector(result);
+		}
+		return result;
 	}
 
 	assignment(value) {
@@ -147,6 +209,8 @@ module.exports = class Parser {
 			return this.convert(r);
 		} else if (a?.type == "ASSIGNMENT") {
 			return this.assignment(r);
+		} else if (a?.type == "LBRACK") {
+			return this.arraySelector(r);
 		}
 
 		return r;
@@ -290,6 +354,8 @@ module.exports = class Parser {
 				return this.loop();
 			case "EXPR_END":
 				return null;
+			case "LBRACK":
+				return this.array();
 			default:
 				const r = this.next;
 				this.advance();
@@ -370,6 +436,7 @@ module.exports = class Parser {
 			const right = this[next]();
 
 			left = {
+				type: "OPERATION",
 				operator,
 				left,
 				right

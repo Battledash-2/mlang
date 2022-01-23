@@ -1,7 +1,7 @@
 import "./tests/imports_greet.m"
 
 func sayHelloTo {
-    util.log("Hello, " + util.arg + "!")
+	util.log("Hello, " + util.arg + "!")
 }
 
 sayHelloTo("Nemo") // Hello, Nemo!

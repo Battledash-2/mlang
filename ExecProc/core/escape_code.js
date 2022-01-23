@@ -1,20 +1,20 @@
 const escapes = [
-    [/\\("|'|`)/g, "$1"],
-    [/\\n/g, "\n"],
-    [/\\e/g, "\u001b"],
-    [/\\r/g, "\r"],
+	[/\\("|'|`)/g, "$1"],
+	[/\\n/g, "\n"],
+	[/\\e/g, "\u001b"],
+	[/\\r/g, "\r"],
 
-    [/\\\\/g, "\\"]
-]
+	[/\\\\/g, "\\"],
+];
 
-module.exports = (str)=>{
-    const rs = (from, to)=>{
-        str = str.replace(new RegExp("(?<!\\\\)" + from.source, "gi"), to);
-    }
+module.exports = (str) => {
+	const rs = (from, to) => {
+		str = str.replace(new RegExp("(?<!\\\\)" + from.source, "gi"), to);
+	};
 
-    for (let [regex, replace] of escapes) {
-        rs(regex, replace);
-    }
+	for (let [regex, replace] of escapes) {
+		rs(regex, replace);
+	}
 
-    return str;
-}
+	return str;
+};

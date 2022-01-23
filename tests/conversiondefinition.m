@@ -1,5 +1,5 @@
 convert welcome, them {
-    "Welcome, " + util.arg + "!"
+	"Welcome, "+util.arg+"!"
 }
 
 util.log("Dora the Explorer" => welcome, them)

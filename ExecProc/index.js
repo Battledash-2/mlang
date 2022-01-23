@@ -4,11 +4,11 @@ const Interpreter = require("./interpreter");
 
 module.exports = class ExecProc {
 	constructor(source, filename, absolutePath) {
-        const tokens = new Tokenizer(source, filename, absolutePath);
-        const ast    = new Parser(tokens, filename, absolutePath);
+		const tokens = new Tokenizer(source, filename, absolutePath);
+		const ast = new Parser(tokens, filename, absolutePath);
 
-        // return         ast;
-        
-        return         new Interpreter(ast, filename, absolutePath);
-    }
+		// return		 ast;
+
+		return new Interpreter(ast, filename, absolutePath);
+	}
 };

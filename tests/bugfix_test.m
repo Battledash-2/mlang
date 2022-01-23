@@ -1,7 +1,7 @@
 func a {
-    if (util.arg > 0) {
-        util.log("OVER 0")
-    }
+	if (util.arg > 0) {
+		util.log("OVER 0")
+	}
 }
 
 a(4)

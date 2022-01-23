@@ -1,5 +1,5 @@
 func makeNegative {
-    -util.arg
+	-util.arg
 }
 
 util.log(makeNegative(5))

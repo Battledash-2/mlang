@@ -2,7 +2,7 @@ import "std";
 import "math";
 
 func getRandom {
-    math::random();
+	math::random();
 }
 
 std::log(getRandom());

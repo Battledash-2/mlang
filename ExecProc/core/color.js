@@ -1,7 +1,9 @@
+const Screen = require("./display_on_screen");
 const Typeof = require("./typeof");
 
 module.exports = (str) => {
 	if (str.hasOwnProperty("name")) str.type = Typeof(str.value);
+	str.value = Screen(str.value);
 	return str == null
 		? "\u001b[1;35mundefined\u001b[0m"
 		: str?.type == "STRING"

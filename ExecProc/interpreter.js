@@ -39,8 +39,8 @@ module.exports = class Interpreter {
 
 		this.global = require("./core/main")(this.createToken);
 		this.local = new Scope(this.global);
-        
-        this.userFunctions = {}; // functions defined by user
+
+		this.userFunctions = {}; // functions defined by user
 		this.userConversions = {};
 
 		this.exports = {};
@@ -52,15 +52,27 @@ module.exports = class Interpreter {
 
 		this.assignOperations = {
 			// assignOperations[operator](variable, operation);
-			"+=": (v, o) => {this.local[v] += o;},
-			"-=": (v, o) => {this.local[v] -= o;},
+			"+=": (v, o) => {
+				this.local[v] += o;
+			},
+			"-=": (v, o) => {
+				this.local[v] -= o;
+			},
 
-			"%=": (v, o) => {this.local[v] %= o;},
-			"*=": (v, o) => {this.local[v] *= o;},
+			"%=": (v, o) => {
+				this.local[v] %= o;
+			},
+			"*=": (v, o) => {
+				this.local[v] *= o;
+			},
 
-			"^=": (v, o) => {this.local[v] **= o;},
+			"^=": (v, o) => {
+				this.local[v] **= o;
+			},
 
-			"=": (v, o) => {this.local[v] = o;}
+			"=": (v, o) => {
+				this.local[v] = o;
+			},
 		};
 
 		return this.start(ast.body);
@@ -78,14 +90,17 @@ module.exports = class Interpreter {
 		};
 	}
 
-	getVar(name, withError=true) {
+	getVar(name, withError = true) {
 		if (this.varExists(name)) {
 			return this.local[name];
 		}
-		if (withError) throw new Error(`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+		if (withError)
+			throw new Error(
+				`Attempted to GET an uninitialized variable: '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
+			);
 	}
 
-	deleteVar(name, withError=true) {
+	deleteVar(name, withError = true) {
 		if (this.varExists(name)) {
 			delete this.local[name];
 			return null;
@@ -101,7 +116,12 @@ module.exports = class Interpreter {
 	}
 
 	createVar(value, name, internal = false) {
-		if (!internal && name.startsWith("$") && !name.startsWith("$last") && !name.startsWith("$pid")) {
+		if (
+			!internal &&
+			name.startsWith("$") &&
+			!name.startsWith("$last") &&
+			!name.startsWith("$pid")
+		) {
 			throw new Error(
 				`Variable names beginning with '$' are reserved for pointers. (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
 			);
@@ -140,7 +160,7 @@ module.exports = class Interpreter {
 			this.createVar(arg?.value, "util.arg", true);
 			const result = this.start(this.userConversions[fname], false)[0] || null;
 			this.deleteVar("util.arg", false);
-            
+
 			this.local = this.local["%PAR"];
 			return result;
 		}
@@ -149,13 +169,13 @@ module.exports = class Interpreter {
 		);
 	}
 
-	looseVar(varName, err=true) {
+	looseVar(varName, err = true) {
 		if (this.userFunctions.hasOwnProperty(varName)) return varName;
 		return this.getVar(varName, err);
 	}
 
-	start(node, newScope=true) {
-        if (newScope === true) this.local = new Scope(this.local);
+	start(node, newScope = true) {
+		if (newScope === true) this.local = new Scope(this.local);
 
 		let r = [];
 		for (let o in node) {
@@ -164,14 +184,14 @@ module.exports = class Interpreter {
 			if (add?.type == "BREAK") {
 				r.push({
 					type: add?.type,
-					position: add?.position
+					position: add?.position,
 				});
 				break;
-			};
+			}
 			r.push(add);
 		}
-        
-        if (newScope === true) this.local = this.local["%PAR"];
+
+		if (newScope === true) this.local = this.local["%PAR"];
 		if (this.returnExports) {
 			return this.exports;
 		} else {
@@ -200,7 +220,8 @@ module.exports = class Interpreter {
 				}
 			}
 
-			const result = this.start(this.userFunctions[fname], false)[0] || null;
+			const result =
+				this.start(this.userFunctions[fname], false)[0] || null;
 
 			if (Array.isArray(arg)) {
 				for (let pos in arg) {
@@ -236,7 +257,7 @@ module.exports = class Interpreter {
 		const ast = new Parser(tokens, fileName, fileName);
 		const exported = new Interpreter(ast, fileName, fileName, true);
 
-		Object.entries(exported).forEach(([ name, value ]) => {
+		Object.entries(exported).forEach(([name, value]) => {
 			if (value.type === "DEFINEF") {
 				this.userFunctions[moduleName + "::" + name] = value.body;
 			} else {
@@ -253,13 +274,13 @@ module.exports = class Interpreter {
 		}
 
 		if (Array.isArray(node.arg)) {
-			arg = node.arg.map(c=>{
+			arg = node.arg.map((c) => {
 				if (c.type == "IDENTIFIER") {
 					return {
 						type: c.type,
 						name: c.value,
 						value: this.looseVar(c.value),
-						position: c.position
+						position: c.position,
 					};
 				}
 				return c;
@@ -289,7 +310,7 @@ module.exports = class Interpreter {
 		return null;
 	}
 
-	evaluate({ value: l }, { value: r }, operator, eou=true) {
+	evaluate({ value: l }, { value: r }, operator, eou = true) {
 		if (operator != null) {
 			if (l?.type == "IDENTIFIER") {
 				l = this.getVar(l.value, eou);
@@ -301,19 +322,36 @@ module.exports = class Interpreter {
 			if (operations[operator]) return operations[operator](l, r);
 			if (binOperations[operator]) return binOperations[operator](l, r);
 
-			throw new Error(`Could not find operator '${operator}' internally (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
+			throw new Error(
+				`Could not find operator '${operator}' internally (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`
+			);
 		}
 	}
 
 	conditionPass(node) {
 		if (node?.left) {
-			if (this.evaluate(this.loop(node?.left, false), this.loop(node?.right, false), node?.operator, false)) {
+			if (
+				this.evaluate(
+					this.loop(node?.left, false),
+					this.loop(node?.right, false),
+					node?.operator,
+					false
+				)
+			) {
 				return true;
 			} else {
 				return false;
 			}
 		} else {
-			if ((this.varExists(node?.value) || node?.value > 0 || node?.value == true) && !(node?.value == true || this.getVar(node?.value, false) == true)) {
+			if (
+				(this.varExists(node?.value) ||
+					node?.value > 0 ||
+					node?.value == true) &&
+				!(
+					node?.value == true ||
+					this.getVar(node?.value, false) == true
+				)
+			) {
 				return true;
 			} else {
 				return false;
@@ -324,13 +362,28 @@ module.exports = class Interpreter {
 
 	condition(node) {
 		if (node?.condition?.left) {
-			if (this.evaluate(this.loop(node?.condition?.left, false), this.loop(node?.condition?.right, false), node?.condition?.operator, false)) {
+			if (
+				this.evaluate(
+					this.loop(node?.condition?.left, false),
+					this.loop(node?.condition?.right, false),
+					node?.condition?.operator,
+					false
+				)
+			) {
 				return this.start(node?.pass?.body)[0] || null;
 			} else if (node?.fail?.body != null) {
 				return this.start(node?.fail?.body)[0] || null;
 			}
 		} else {
-			if ((this.varExists(node?.condition?.value) || node?.condition?.value > 0 || node?.condition?.value == true) && !(node?.condition?.value == true || this.getVar(node?.condition?.value, false) == true)) {
+			if (
+				(this.varExists(node?.condition?.value) ||
+					node?.condition?.value > 0 ||
+					node?.condition?.value == true) &&
+				!(
+					node?.condition?.value == true ||
+					this.getVar(node?.condition?.value, false) == true
+				)
+			) {
 				return this.start(node?.pass?.body)[0] || null;
 			} else if (node?.fail?.body != null) {
 				return this.start(node?.fail?.body)[0] || null;
@@ -339,12 +392,21 @@ module.exports = class Interpreter {
 		return null;
 	}
 
-	loop(node, errorOnUndefined=true) {
+	loop(node, errorOnUndefined = true) {
 		if (node?.type == "BREAK") {
 			return {
 				type: "BREAK",
-				position: node?.position
-			}
+				position: node?.position,
+			};
+		}
+
+		if (node?.type == "ARRAY") {
+			node.values = node?.values ?? node?.value;
+			return {
+				type: "ARRAY",
+				value: node?.values.map?.((c) => this.loop(c)),
+				position: node?.position,
+			};
 		}
 
 		if (node?.type == "DEFINITION") {
@@ -399,17 +461,25 @@ module.exports = class Interpreter {
 
 		if (node?.type == "CONVERT") {
 			this.pos = node;
-			if (this.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
+			if (
+				this.userConversions.hasOwnProperty(
+					`${node.from?.value}-${node.to?.value}`
+				)
+			) {
 				return this.execConvert(
 					`${node.from?.value}-${node.to?.value}`,
 					this.loop(node.value)
 				);
-			} else if (this.conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
+			} else if (
+				this.conversions.hasOwnProperty(
+					`${node.from?.value}-${node.to?.value}`
+				)
+			) {
 				return {
 					type: "NUMBER",
-					value: this.conversions[`${node.from?.value}-${node.to?.value}`](
-						this.loop(node.value)
-					),
+					value: this.conversions[
+						`${node.from?.value}-${node.to?.value}`
+					](this.loop(node.value)),
 					position: node?.position,
 				};
 			} else {
@@ -449,11 +519,18 @@ module.exports = class Interpreter {
 			if (!node?.file?.endsWith(".js") && fs.existsSync(node?.file)) {
 				this.importFile(node);
 			} else if (fs.existsSync(node?.file)) {
-				let p = this.fp.replace(/\\/g, "/").split("/").map(c=>c==""?"/":c);
+				let p = this.fp
+					.replace(/\\/g, "/")
+					.split("/")
+					.map((c) => (c == "" ? "/" : c));
 				p.pop();
 				const userModule = require(path.join(...p, node?.file));
 				this.implement(userModule);
-			} else if (fs.existsSync(path.join(__dirname, "core", "modules", node?.file))) {
+			} else if (
+				fs.existsSync(
+					path.join(__dirname, "core", "modules", node?.file)
+				)
+			) {
 				const coreModule = require(path.join(
 					__dirname,
 					"core",
@@ -462,7 +539,9 @@ module.exports = class Interpreter {
 				));
 				this.implement(coreModule);
 			} else {
-				throw new Error(`Attempt to import a non-existent file '${node?.file}' (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`);
+				throw new Error(
+					`Attempt to import a non-existent file '${node?.file}' (${this.fn}:${this.pos.position.line}:${this.pos.position.cursor})`
+				);
 			}
 			return null;
 		}
@@ -503,9 +582,18 @@ module.exports = class Interpreter {
 				return this.assign(
 					node?.variable,
 					node?.operation,
-					node?.operator);
+					node?.operator
+				);
 			} else {
-				throw new Error(`Cannot assign variable '${node?.variable?.value}' without 'let' or 'var' keyword (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+				if (node?.variable?.type == "ARRAY_SELECT") {
+					throw new Error(
+						`Cannot change value of arrays (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
+					);
+				} else {
+					throw new Error(
+						`Cannot assign variable '${node?.variable?.value}' without 'let' or 'var' keyword (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
+					);
+				}
 			}
 		}
 
@@ -524,6 +612,23 @@ module.exports = class Interpreter {
 
 			this.local = this.local["%PAR"];
 			return null;
+		}
+
+		if (node?.type == "ARRAY_SELECT") {
+			const pos = this.loop(node?.goto).value;
+			// console.log(node?.array?.type) // fcall
+			let arr;
+			if (node?.array?.type == "FCALL") {
+				arr = this.fcall(node?.array).values;
+			} else {
+				arr = this.loop(node?.array).value;
+			}
+
+			if (pos in arr) {
+				return this.loop(arr[pos]);
+			} else {
+				return null;
+			}
 		}
 
 		if (node?.value != null) {
