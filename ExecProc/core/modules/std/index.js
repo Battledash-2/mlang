@@ -1,3 +1,4 @@
+const Typeof = require("../../typeof");
 const Color = require("../../color");
 const Interface = require("../../interface");
 
