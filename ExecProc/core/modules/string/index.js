@@ -45,12 +45,12 @@ module.exports = class StringUtil extends Interface {
             },
 
 			"substring": (args)=>{
-				this.expectArguments(3, args, "substring", "string", true);
+				this.expectArguments(2, args, "substring", "string", true);
 				
 				const stmo = this.getArgumentObjectAt(args, 0);
 				
 				const si1 = this.getArgumentObjectAt(args, 1);
-				const si2 = this.getArgumentObjectAt(args, 2) || stmo?.value?.length;
+				const si2 = this.getArgumentObjectAt(args, 2) || this.getTokenFrom(stmo?.value?.length);
 				
 				this.typeAssertError("STRING", stmo, "index", "string");
 				this.typeAssertError("NUMBER", si1, "index", "string");
