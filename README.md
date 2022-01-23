@@ -1,4 +1,4 @@
-# MLang (v1.8.5patch-2): The Mathematics Language
+# MLang (v1.8.5u-3): The Mathematics Language
 
 ## What is M
 
@@ -6,7 +6,8 @@
 
 ## Project Status
 
-#### Version: v1.8.5patch-2
+#### Version: v1.8.5u-3
+- Better repl (using `let varname = 5` and then in the next prompt entering `print(varname)` will work)
 - Bug fix & constant variables
 
 ## Known Bugs

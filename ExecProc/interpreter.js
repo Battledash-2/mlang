@@ -34,12 +34,12 @@ const binOperations = {
 };
 
 module.exports = class Interpreter {
-	constructor(ast, fn, fp, returnExports = false) {
+	constructor(ast, fn, fp, returnExports=false, scope) {
 		this.fn = fn;
 		this.fp = fp;
 
 		this.global = require("./core/main")(this.createToken);
-		this.local = new Scope(this.global);
+		this.local = scope ?? new Scope(this.global);
 
 		this.userFunctions = {}; // functions defined by user
 		this.userConversions = {};
@@ -63,12 +63,14 @@ module.exports = class Interpreter {
 			"=": (v, o) => {this.local[v].value = o;},
 		};
 
-		return this.start(ast.body);
+		return this.start(ast.body, false);
 	}
 
 	implement(m) {
 		return new m(this);
 	}
+
+	static createToken(...args) {return this.createToken(...args)}
 
 	createToken(type, value, position) {
 		return {
@@ -145,7 +147,7 @@ module.exports = class Interpreter {
 			this.local = new Scope(this.local);
 
 			this.createVar(arg?.value, "util.arg", true);
-			const result = this.start(this.userConversions[fname], false)[0] || null;
+			const result = this.start(this.userConversions[fname], false).output[0] || null;
 			this.deleteVar("util.arg", false);
 
 			this.local = this.local["%PAR"];
@@ -161,7 +163,7 @@ module.exports = class Interpreter {
 		return this.getVar(varName, err);
 	}
 
-	start(node, newScope = true) {
+	start(node, newScope=true) {
 		if (newScope === true) this.local = new Scope(this.local);
 
 		let r = [];
@@ -182,7 +184,10 @@ module.exports = class Interpreter {
 		if (this.returnExports) {
 			return this.exports;
 		} else {
-			return r;
+			return {
+				output: r,
+				scope: this.local
+			};
 		}
 	}
 
@@ -207,7 +212,7 @@ module.exports = class Interpreter {
 				}
 			}
 
-			const result = this.start(this.userFunctions[fname], false)[0] || null;
+			const result = this.start(this.userFunctions[fname], false).output[0] || null;
 
 			if (Array.isArray(arg)) {
 				for (let pos in arg) {
@@ -227,6 +232,7 @@ module.exports = class Interpreter {
 			}
 
 			this.local = this.local["%PAR"];
+
 			return result;
 		}
 		throw new Error(
@@ -361,9 +367,9 @@ module.exports = class Interpreter {
 					false
 				)
 			) {
-				return this.start(node?.pass?.body)[0] || null;
+				return this.start(node?.pass?.body).output[0] || null;
 			} else if (node?.fail?.body != null) {
-				return this.start(node?.fail?.body)[0] || null;
+				return this.start(node?.fail?.body).output[0] || null;
 			}
 		} else {
 			if (
@@ -375,9 +381,9 @@ module.exports = class Interpreter {
 					this.getVar(node?.condition?.value, false) == true
 				)
 			) {
-				return this.start(node?.pass?.body)[0] || null;
+				return this.start(node?.pass?.body).output[0] || null;
 			} else if (node?.fail?.body != null) {
-				return this.start(node?.fail?.body)[0] || null;
+				return this.start(node?.fail?.body).output[0] || null;
 			}
 		}
 		return null;
@@ -604,7 +610,7 @@ module.exports = class Interpreter {
 
 			this.start(dec, false);
 			while (this.conditionPass(sta)) {
-				if (this.start(dow?.body, false)[0]?.type == "BREAK") break;
+				if (this.start(dow?.body, false).output[0]?.type == "BREAK") break;
 			}
 
 			this.local = this.local["%PAR"];

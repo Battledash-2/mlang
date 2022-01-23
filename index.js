@@ -5,6 +5,7 @@ const mode = process.argv[2];
 const filename = process.argv[3]; // file or terminal / console
 
 const ExecProc = require("./ExecProc");
+const Interpreter = require("./ExecProc/interpreter");
 
 if (mode == null) {
 	console.error("Missing argument 1");
@@ -24,7 +25,7 @@ if (mode == null) {
 					: `${process.cwd()}\\${filename}`
 			);
 			console.log(
-				"Result execution process: " + JSON.stringify(result, null, 4)
+				"Result execution process: " + JSON.stringify(result.output, null, 4)
 			);
 		} else {
 			console.error(`File '${filename}' does not exist.`);
@@ -50,6 +51,8 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 			);
 		};
 
+		let replScope = require("./ExecProc/core/main")(Interpreter.createToken);
+
 		function ask() {
 			interface.question(
 				"\u001b[1;97mmlang \u001b[1;31m$ \u001b[0m",
@@ -60,15 +63,16 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 						return;
 					}
 
-					const result = new ExecProc(response, "runtime", "runtime");
+					const result = new ExecProc(response, "runtime", "runtime", replScope);
+					replScope = result.scope;
 					console.log(
-						result[0] == null
+						result.output[0] == null
 							? "\u001b[1;35mundefined\u001b[0m"
-							: result[0]?.type == "STRING"
-							? `\u001b[92m"${result[0].value}"\u001b[0m`
-							: result[0]?.type == "BOOLEAN"
-							? "\u001b[1;91m" + result[0]?.value + "\u001b[0m"
-							: result[0].value
+							: result.output[0]?.type == "STRING"
+							? `\u001b[92m"${result.output[0].value}"\u001b[0m`
+							: result.output[0]?.type == "BOOLEAN"
+							? "\u001b[1;91m" + result.output[0]?.value + "\u001b[0m"
+							: result.output[0].value
 					);
 
 					ask();
