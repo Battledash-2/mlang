@@ -11,7 +11,6 @@ module.exports = class Scope {
                     parentPointer[prop] = value;
                 } else {
                     Reflect.set(target, prop, value);
-					console.log(this, target)
                 };
                 return true;
             }
