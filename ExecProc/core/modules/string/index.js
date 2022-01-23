@@ -14,7 +14,7 @@ module.exports = class StringUtil extends Interface {
                 this.typeAssertError("STRING", stmo, "indexof", "string");
                 this.typeAssertError("STRING", char, "indexof", "string");
                 
-                return this.createToken("NUMBER", stmo?.value.indexOf(char?.value), this.getPositionObject())
+                return this.createToken("NUMBER", stmo?.value.indexOf(char?.value), this.getPositionObject());
             },
             
             "at": (args)=>{
@@ -26,7 +26,7 @@ module.exports = class StringUtil extends Interface {
                 this.typeAssertError("STRING", stmo, "at", "string");
                 this.typeAssertError("NUMBER", char, "at", "string");
                 
-                return this.createToken("STRING", stmo[char?.value] || "", this.getPositionObject())
+                return this.createToken("STRING", stmo[char?.value] || "", this.getPositionObject());
             },
             
             "slice": (args)=>{
@@ -41,8 +41,25 @@ module.exports = class StringUtil extends Interface {
                 this.typeAssertError("NUMBER", si1, "index", "string");
                 this.typeAssertError("NUMBER", si2, "index", "string");
                 
-                return this.createToken("STRING", stmo?.value.slice(si1?.value, si2?.value), this.getPositionObject())
+                return this.createToken("STRING", stmo?.value.slice(si1?.value, si2?.value), this.getPositionObject());
             },
+
+			"substring": (args)=>{
+				this.expectArguments(3, args, "index", "string", true);
+				
+				const stmo = this.getArgumentObjectAt(args, 0);
+				
+				const si1 = this.getArgumentObjectAt(args, 1);
+				const si2 = this.getArgumentObjectAt(args, 2);
+				
+				this.typeAssertError("STRING", stmo, "index", "string");
+				this.typeAssertError("NUMBER", si1, "index", "string");
+				this.typeAssertError("NUMBER", si2, "index", "string");
+				
+				return this.createToken("STRING", stmo?.value.substring(si1?.value, si2?.value), this.getPositionObject());
+			},
+
+			"substr": (...args)=>{stringFunctions["substring"](...args)},
             
             "match": (args)=>{
                 this.expectArguments(2, args, "match", "string", true); // spec
