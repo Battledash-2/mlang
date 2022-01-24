@@ -27,9 +27,9 @@ module.exports = class InterpreterInterface {
 
 		Object.entries(exported).forEach(([name, value]) => {
 			if (value.type === "DEFINEF") {
-				this.interface?.userFunctions[as + "::" + name] = value.body;
+				this.interface.userFunctions[as + "::" + name] = value.body;
 			} else {
-				this.interface?.local[as + "::" + name] = value.value;
+				this.interface.local[as + "::" + name] = value.value;
 			}
 		});
 	}
