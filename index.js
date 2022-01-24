@@ -71,20 +71,24 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 					}
 
 					if (debugMode) console.time("Execution took");
-
-					const result = new ExecProc(response, "runtime", "runtime", replScope.vars, replScope.funcs, replScope.convs);
-					replScope["vars"] = result.scope;
-					replScope["funcs"] = result.functions;
-					replScope["convs"] = result.conversions;
-					console.log(
-						result.output[0] == null
-							? "\u001b[1;35mundefined\u001b[0m"
-							: result.output[0]?.type == "STRING"
-							? `\u001b[92m"${result.output[0].value}"\u001b[0m`
-							: result.output[0]?.type == "BOOLEAN"
-							? "\u001b[1;91m" + result.output[0]?.value + "\u001b[0m"
-							: result.output[0].value
-					);
+					let result;
+					try {
+						result = new ExecProc(response, "runtime", "runtime", replScope.vars, replScope.funcs, replScope.convs);
+						replScope["vars"] = result.scope;
+						replScope["funcs"] = result.functions;
+						replScope["convs"] = result.conversions;
+						console.log(
+							result.output[0] == null
+								? "\u001b[1;35mundefined\u001b[0m"
+								: result.output[0]?.type == "STRING"
+								? `\u001b[92m"${result.output[0].value}"\u001b[0m`
+								: result.output[0]?.type == "BOOLEAN"
+								? "\u001b[1;91m" + result.output[0]?.value + "\u001b[0m"
+								: result.output[0].value
+						);
+					} catch(e) {
+						console.error("\u001b[0;91mError: \u001b[0;1m"+e.message+"\u001b[0m");
+					}
 
 					if (debugMode) console.timeEnd("Execution took");
 
