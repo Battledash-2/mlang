@@ -14,6 +14,7 @@ if (mode == null) {
 		if (fs.existsSync(filename)) {
 			// console.log(String(fs.readFileSync(filename)));
 			const filecontent = String(fs.readFileSync(filename));
+			console.time("Execution took");
 			const result = new ExecProc(
 				filecontent,
 				filename,
@@ -27,6 +28,7 @@ if (mode == null) {
 			console.log(
 				"Result execution process: " + JSON.stringify(result.output, null, 4)
 			);
+			console.timeEnd("Execution took");
 		} else {
 			console.error(`File '${filename}' does not exist.`);
 		}
@@ -67,6 +69,8 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 						return;
 					}
 
+					console.time("Execution took");
+
 					const result = new ExecProc(response, "runtime", "runtime", replScope.vars, replScope.funcs, replScope.convs);
 					replScope["vars"] = result.scope;
 					replScope["funcs"] = result.functions;
@@ -80,6 +84,8 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 							? "\u001b[1;91m" + result.output[0]?.value + "\u001b[0m"
 							: result.output[0].value
 					);
+
+					console.timeEnd("Execution took");
 
 					ask();
 				}
