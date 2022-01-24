@@ -27,9 +27,9 @@ module.exports = class InterpreterInterface {
 
 		Object.entries(exported).forEach(([name, value]) => {
 			if (value.type === "DEFINEF") {
-				this.userFunctions[as + "::" + name] = value.body;
+				this.interface?.userFunctions[as + "::" + name] = value.body;
 			} else {
-				this.variables[as + "::" + name] = value.value;
+				this.interface?.local[as + "::" + name] = value.value;
 			}
 		});
 	}
@@ -105,7 +105,7 @@ module.exports = class InterpreterInterface {
 		return this.interface?.userFunctions[arg] != null;
 	}
 	isBuiltInFunction(arg) {
-		return typeof this.interface?.variables[arg] == "function";
+		return typeof this.interface?.local[arg] == "function";
 	}
 	isFunction(arg) {
 		return this.isUserFunction(arg) || this.isBuiltInFunction(arg);

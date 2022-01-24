@@ -1,4 +1,4 @@
-const Interface = require("./internal_interface");
+const Interface = require("./internal");
 const Screen = require("./display_on_screen");
 const Typeof = require("./typeof");
 
@@ -74,8 +74,8 @@ module.exports = (ct, it)=>{
 			// expectArguments(amount=1, args, functionName="N/A", moduleName="N/A", allowMore) {
 			console.log(form(args));
 		},
-		"format": (args)=>{
-			return createToken("STRING", form(args), handle.getPositionObject()); // can also do handle.createToken
+		"format": (args, pos)=>{
+			return createToken("STRING", form(args), pos.position); // can also do handle.createToken
 		},
         "util.sin": (arg, pos)=>createToken("NUMBER", Math.sin(arg.value), pos.position),
         "util.cosin": (arg, pos)=>createToken("NUMBER", Math.cos(arg.value), pos.position),

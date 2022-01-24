@@ -3,9 +3,9 @@ module.exports = (arg)=>{
 	switch (typeof arg) { // custom
 		case "undefined":
 			return "NULL";
-		default:
+		case "object":
 			if (Array.isArray(arg)) return "ARRAY";
-		// most of the types are the same as javascript, so we don't need anything here yet
+		// most of the types are the same as javascript, so we don't need much here yet
 	}
 
 	return arg;
