@@ -51,7 +51,11 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 			);
 		};
 
-		let replScope = require("./ExecProc/core/main")(Interpreter.createToken);
+		let replScope = {
+			vars: require("./ExecProc/core/main")(Interpreter.createToken),
+			funcs: {},
+			convs: {}
+		}
 
 		function ask() {
 			interface.question(
@@ -63,8 +67,10 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 						return;
 					}
 
-					const result = new ExecProc(response, "runtime", "runtime", replScope);
-					replScope = result.scope;
+					const result = new ExecProc(response, "runtime", "runtime", replScope.vars, replScope.funcs, replScope.convs);
+					replScope["vars"] = result.scope;
+					replScope["funcs"] = result.functions;
+					replScope["convs"] = result.conversions;
 					console.log(
 						result.output[0] == null
 							? "\u001b[1;35mundefined\u001b[0m"

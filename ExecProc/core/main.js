@@ -1,11 +1,65 @@
-const Color = require("./color");
-const Typeof = require("./typeof");
+const Interface = require("./internal_interface");
 const Screen = require("./display_on_screen");
+const Typeof = require("./typeof");
 
-let createToken = (type, value, position)=>{type,value,position}
+let createToken = (type, value, position)=>({type,value,position});
 
-module.exports = (ct)=>{
-	createToken = ct ?? createToken;
+const format = {
+	v: (v)=>v, // value
+	
+	l: (v)=>v.length, // length
+	t: (v)=>Typeof(v), // type
+
+	b: (v)=>"\u001b[1m"+v+"\u001b[0m", // bold
+	i: (v)=>"\u001b[3m"+v+"\u001b[0m", // italic
+	s: (v)=>"\u001b[9m"+v+"\u001b[0m", // strikethrough
+	u: (v)=>"\u001b[4m"+v+"\u001b[0m", // underline
+}
+
+module.exports = (ct, it)=>{
+	// createToken = ct ?? createToken;
+	const handle = new Interface(it);
+
+	function form(args) {
+		handle.expectArguments(1, args, "printf", "builtin", true);
+		
+		let str = handle.getArgumentObjectAt(args, 0);
+		const other = handle.getArgumentValues(args);
+		other.shift();
+
+		handle.typeAssertError("STRING", str, "printf", "builtin");
+
+		str = str?.value ?? "";
+		let i = 0;
+		do {
+			let val = other[i];
+			i++; 
+
+			str = str.replace(/(?:(?<!\\))%[a-z]/, (match)=>{
+				const operator = match.slice(1);
+
+				if (format.hasOwnProperty(operator)) {
+					if (typeof val == "undefined") handle.throwError("Saw operator without a value", "format", "builtin");
+					return format[operator](val);
+				}
+
+				handle.throwError("Unknown operator '%"+operator+"': Try using a '\\'", "format", "builtin");
+			});
+		} while (i < other.length);
+
+		str = str.replace(/(?:(?<!\\))%[a-z]/g, (match)=>{
+			const operator = match.slice(1);
+
+			if (format.hasOwnProperty(operator)) {
+				if (typeof other.slice(-1)[0] == "undefined") handle.throwError("Saw operator without a value", "format", "builtin");
+				return format[operator](other.slice(-1)[0]);
+			}
+
+			handle.throwError("Unknown operator '%"+operator+"': Try using a '\\'", "format", "builtin");
+		});
+
+		return Screen(str, true, false);
+	}
 
     let num = 0;
     return { // predefine functions an variables here (note: these can be overwritting by the user, although they cannot create functions)
@@ -14,23 +68,21 @@ module.exports = (ct)=>{
 			constant: true
 		},
         "util.enum": (_arg, _pos, caller)=>{return createToken("NUMBER", ++num, caller.position);},
-        "util.log": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value).join(" ") || (arg?.value || ""), true)),
-		"print": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value).join(" ") || (arg?.value || ""), true)),
-        "printf": (arg)=>{
-			arg.value = typeof arg.value == "string" ? arg.value : Screen(arg.value);
-			let send = "";
-			if (((arg?.value ? 1 : arg?.length) || 0) > 1) {
-				send = arg.map(c=>Typeof(c.value) != "STRING" ? Color(c) : c?.value).join(" ");
-			} else {
-				send = Typeof(arg?.value) != "STRING" ? Color(arg) : arg?.value;
-			}
-
-			console.log(send);
+        "util.log": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value) || (arg?.value || ""), true, false)),
+		"print": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value) || (arg?.value || ""), true, false)),
+        "printf": (args)=>{
+			// expectArguments(amount=1, args, functionName="N/A", moduleName="N/A", allowMore) {
+			console.log(form(args));
+		},
+		"format": (args)=>{
+			return createToken("STRING", form(args), handle.getPositionObject()); // can also do handle.createToken
 		},
         "util.sin": (arg, pos)=>createToken("NUMBER", Math.sin(arg.value), pos.position),
         "util.cosin": (arg, pos)=>createToken("NUMBER", Math.cos(arg.value), pos.position),
 		"util.len": (arg, pos)=>createToken("NUMBER", arg.value.length, pos.position),
-        "util.strlen": (arg, pos)=>createToken("NUMBER", String(arg.value).length, pos.position),
+        "util.strlen": (arg, pos)=>{
+			return createToken("NUMBER", String(arg.value).length, pos.position)
+		},
         "util.has": (args, pos)=>createToken("BOOLEAN", args[0].value.includes(args[1].value), pos.position),
         "util.typeof": (arg, _pos, caller)=>createToken("STRING", arg?.type ?? "NULL", caller?.position),
 

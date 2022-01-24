@@ -34,15 +34,15 @@ const binOperations = {
 };
 
 module.exports = class Interpreter {
-	constructor(ast, fn, fp, returnExports=false, scope) {
+	constructor(ast, fn, fp, returnExports=false, scope, functions, conversions) {
 		this.fn = fn;
 		this.fp = fp;
 
-		this.global = require("./core/main")();
+		this.global = require("./core/main")(null, this);
 		this.local = scope ?? new Scope(this.global);
 
-		this.userFunctions = {}; // functions defined by user
-		this.userConversions = {};
+		this.userFunctions = functions ?? {}; // functions defined by user
+		this.userConversions = conversions ?? {};
 
 		this.exports = {};
 		this.returnExports = returnExports;
@@ -186,12 +186,14 @@ module.exports = class Interpreter {
 		} else {
 			return {
 				output: r,
-				scope: this.local
+				scope: this.local,
+				functions: this.userFunctions,
+				conversions: this.conversions
 			};
 		}
 	}
 
-	execFunc(fname, arg, idname) {
+	execFunc(fname, arg) {
 		if (this.userFunctions[fname]) {
 			this.local = new Scope(this.local);
 
@@ -200,7 +202,7 @@ module.exports = class Interpreter {
 					let cur = arg[pos];
 					let posi = pos == 0 ? "" : String(pos);
 
-					this.createVar(cur.value, "util.arg" + posi);
+					this.createVar(cur.value, "util.arg" + posi, false, false);
 					if (cur.type == "IDENTIFIER") {
 						this.setPointer("pid" + posi, cur.value);
 					}
@@ -279,7 +281,8 @@ module.exports = class Interpreter {
 		}
 
 		if (typeof this.getVar(fname, false) == "function") {
-			return this.getVar(fname)(arg, node.arg, node);
+			let rv = this.getVar(fname)(arg, node.arg, node);
+			return rv;
 		} else {
 			return this.execFunc(fname, arg /*node.arg, node*/);
 		}
@@ -464,20 +467,12 @@ module.exports = class Interpreter {
 
 		if (node?.type == "CONVERT") {
 			this.pos = node;
-			if (
-				this.userConversions.hasOwnProperty(
-					`${node.from?.value}-${node.to?.value}`
-				)
-			) {
+			if (this.userConversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
 				return this.execConvert(
 					`${node.from?.value}-${node.to?.value}`,
 					this.loop(node.value)
 				);
-			} else if (
-				this.conversions.hasOwnProperty(
-					`${node.from?.value}-${node.to?.value}`
-				)
-			) {
+			} else if (this.conversions.hasOwnProperty(`${node.from?.value}-${node.to?.value}`)) {
 				return {
 					type: "NUMBER",
 					value: this.conversions[

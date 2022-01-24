@@ -1,4 +1,4 @@
-# MLang (v1.8.5u-3): The Mathematics Language
+# MLang (v1.8.5patch-6): The Mathematics Language
 
 ## What is M
 
@@ -6,9 +6,10 @@
 
 ## Project Status
 
-#### Version: v1.8.5u-3
+#### Version: v1.8.5patch-6
+- Modified `printf` functionality (`printf("hello %l", "hello")` will output "hello 5")
 - Better repl (using `let varname = 5` and then in the next prompt entering `print(varname)` will work)
-- Bug fix & constant variables
+- Bug fix & constant variables (with `const` keyword)
 
 ## Known Bugs
 - No known bugs

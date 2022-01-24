@@ -3,12 +3,12 @@ const Parser = require("./parser");
 const Interpreter = require("./interpreter");
 
 module.exports = class ExecProc {
-	constructor(source, filename, absolutePath, scope) {
+	constructor(source, filename, absolutePath, scope, functions, conversions) {
 		const tokens = new Tokenizer(source, filename, absolutePath);
 		const ast = new Parser(tokens, filename, absolutePath);
 
 		// return		 ast;
 
-		return new Interpreter(ast, filename, absolutePath, false, scope);
+		return new Interpreter(ast, filename, absolutePath, false, scope, functions, conversions);
 	}
 };

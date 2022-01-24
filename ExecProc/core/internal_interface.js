@@ -1,15 +1,13 @@
+// simplified and modified version of 'interface.js' with less features for non-module purposes
+
 const Typeof = require("./typeof");
+
 module.exports = class InterpreterInterface {
 	constructor(interpreter) {
 		this.interface = interpreter;
 	}
 
 	// Functional
-	pauseProcess(ms=0) {
-		const end = Date.now() + ms;
-		while (Date.now() < end) continue;
-		return true;
-	}
 	throwError(error, functionName, moduleName) {
 		throw new Error(
 			`${error} in ${moduleName}/${functionName} ${this.errorPosition()}`
@@ -20,42 +18,26 @@ module.exports = class InterpreterInterface {
 	importFile(file) {
 		return this.interface.importFile({ file });
 	}
-	importFromText(value, as="_") {
-		const tokens = new Tokenizer(value, "import", "import");
-		const ast = new Parser(tokens, "import", "import");
-		const exported = new Interpreter(ast, "import", "import", true);
-
-		Object.entries(exported).forEach(([name, value]) => {
-			if (value.type === "DEFINEF") {
-				this.userFunctions[as + "::" + name] = value.body;
-			} else {
-				this.variables[as + "::" + name] = value.value;
-			}
-		});
-	}
 
 	// For error logging
 	errorPosition() {
 		return `(${this.getFilename()}:${this.getPosition()})`;
 	}
 	getPosition() {
-		return (
-			this.interface.pos?.position?.line +
-			":" +
-			this.interface.pos?.position?.cursor
-		);
+		return ((+this.interface.pos?.position?.line) + ":" + (+this.interface.pos?.position?.cursor));
 	}
 	getLine() {
-		return this.interface.pos?.position?.line;
+		return +this.interface.pos?.position?.line;
 	}
 	getCursor() {
-		return this.interface.pos?.position?.cursor;
+		return +this.interface.pos?.position?.cursor;
 	}
 	getFilename() {
-		return this.interface.fn;
+		return this.interface?.fn;
 	}
+
 	getPositionObject() {
-		return this.interface.pos?.position;
+		return this.pos?.position;
 	}
 
 	// Arguments
@@ -72,23 +54,11 @@ module.exports = class InterpreterInterface {
 	argumentsLength(args) {
 		return (args?.value ? 1 : args?.length) || 0;
 	}
-	createArgumentList(args) {
-		return [...args.map((c) => this.getTokenFrom(c))];
-	}
 	getArgumentValues(args) {
 		return args?.map?.((c) => c?.value) || [];
 	}
 	concatValues(args, sep=" ") {
 		return args?.map?.((c) => c?.value).join(sep) || args?.value || "";
-	}
-	getArgumentAt(args, pos=0) {
-		const argLen = this.argumentsLength(args);
-		if (pos === 0 && argLen === 1) {
-			return args?.value;
-		} else {
-			if (argLen < pos) return null;
-			return args[pos]?.value;
-		}
 	}
 	getArgumentObjectAt(args, pos=0) {
 		const argLen = this.argumentsLength(args);
@@ -101,12 +71,6 @@ module.exports = class InterpreterInterface {
 	}
 
 	// Functions
-	isUserFunction(arg) {
-		return this.interface?.userFunctions[arg] != null;
-	}
-	isBuiltInFunction(arg) {
-		return typeof this.interface?.variables[arg] == "function";
-	}
 	isFunction(arg) {
 		return this.isUserFunction(arg) || this.isBuiltInFunction(arg);
 	}
@@ -136,17 +100,6 @@ module.exports = class InterpreterInterface {
 	// Functions
 	createFunction(name="", callback=(arg={ value: "" }) => {return false;}) {
 		this.interface.local[name]=callback;
-	}
-	deleteUserFunction(name="") {
-		delete this.interface.userFunctions[name];
-	}
-	deleteBuiltInFunction(name="") {
-		delete this.interface.local[name];
-	}
-	deleteFunction(name="") {
-		if (this.isBuiltInFunction(name))
-			return this.deleteBuiltInFunction(name);
-		return this.deleteUserFunction(name);
 	}
 	executeFunction(name="", argument={ type: "", value: 0, position: { line: 0, cursor: 0 } }) {
 		return this.interface.fcall({
@@ -188,14 +141,6 @@ module.exports = class InterpreterInterface {
 	createToken(type="", value="", position={ cursor: 0, line: 0 }) {
 		return this.interface.createToken(type, value, position);
 	}
-	getTokenFrom(value) {
-		// not recommended
-		return this.interface.createToken(
-			Typeof(value).toString().toUpperCase(),
-			value,
-			this.interface.pos?.position
-		);
-	}
 	getTokenListFrom(...values) {
 		let lt = values;
 		if (typeof arguments[0] == "object" && Array.isArray(arguments[0])) {
@@ -203,31 +148,9 @@ module.exports = class InterpreterInterface {
 		}
 		return lt.map((c) => this.getTokenFrom(c));
 	}
-	getTokenTypeFrom(value) {
-		return Typeof(value).toString().toUpperCase();
-	}
-
-	// Types
-	typeAssert(type, arg) {
-		return arg?.type === type || Typeof(arg?.value) === type;
-	}
 	typeAssertError(type, arg, fname, mname) {
 		if (arg?.type !== type && Typeof(arg?.value) !== type) {
 			console.log(arg)
-			this.throwError(
-				`Expected type '${type}', received '${arg?.type || "none"}'`,
-				fname,
-				mname
-			);
-		}
-		return true;
-	}
-
-	typeAssertStrict(type, arg) {
-		return arg?.type == type;
-	}
-	typeAssertStrictError(type, arg, fname, mname) {
-		if (arg?.type !== type) {
 			this.throwError(
 				`Expected type '${type}', received '${arg?.type || "none"}'`,
 				fname,
