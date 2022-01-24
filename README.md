@@ -15,7 +15,9 @@
 - No known bugs
 
 ## To-Do (in order from Most Important to Least Important)
+- [ ] Add 'import ... as ...'
 - [ ] Add options to modify a value in an array [***HIGH* PRIORITY**]
+- [ ] Objects [***NOT* EXPECTED**]
 
 ## Scrapped Ideas (maybe in the future?)
 - Nothing scrapped...
