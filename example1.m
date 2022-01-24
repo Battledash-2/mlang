@@ -7,4 +7,4 @@ func sayHelloTo {
 sayHelloTo("Nemo") // Hello, Nemo!
 
 let greeting = "Hey"
-util.log(greet("Dora")) // Hey, Dora!
+util.log(imports_greet::greet("Dora")) // Hey, Dora!

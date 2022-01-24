@@ -245,7 +245,7 @@ module.exports = class Interpreter {
 	importFile(node) {
 		const fileContent = fs.readFileSync(node?.file);
 		const fileName = node?.file;
-		const moduleName = fileName.split(".", 1)[0];
+		const moduleName = fileName.split("/").slice(-1)[0].split(".", 1)[0];
 
 		const tokens = new Tokenizer(fileContent, fileName, fileName);
 		const ast = new Parser(tokens, fileName, fileName);

@@ -4,3 +4,5 @@ func greet {
 
 	greeting + ", " + util.arg + "!"
 }
+
+export greet;
