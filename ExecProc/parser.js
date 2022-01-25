@@ -324,8 +324,16 @@ module.exports = class Parser {
 		};
 	}
 
+	emptyStatement() {
+		return {
+			type: "Empty"
+		};
+	}
+
 	primary(origin=false) {
 		switch (this.next?.type) {
+			case "EXPR_END":
+				return this.emptyStatement();
 			case "DEFINE":
 				return this.variableExpression();
 			case "LPAREN":

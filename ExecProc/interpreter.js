@@ -650,6 +650,10 @@ module.exports = class Interpreter {
 			}
 		}
 
+		if (node?.type == "Empty") {
+			return null;
+		}
+
 		if (node?.value != null) {
 			this.pos = node;
 			return node;
