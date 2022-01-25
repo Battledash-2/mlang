@@ -120,14 +120,12 @@ module.exports = class Tokenizer {
 					// if (newlines?.length > 0) this.pos = 0;
 					// console.log(newlines, 'n', newlines?.length);
 					// return this.nextToken();
-					var to = match.indexOf("*/") > -1 ? match.indexOf("*/") : 0;
-					var line = match.slice(0, to).match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
+					var line = match.match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
 					this.line += line;
 					this.pos = line > 0 ? 0 : this.pos;
 					return this.nextToken();
 				case "STRING":
-					var to = match.slice(1).indexOf("\`") > -1 ? match.slice(1).indexOf("\`") : 0;
-					var line = match.slice(1, to).match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
+					var line = match.match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
 					this.line += line;
 					this.pos = line > 0 ? 0 : this.pos;
 					break;
