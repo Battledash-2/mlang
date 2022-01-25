@@ -22,16 +22,17 @@ function file() {
 	if (fs.existsSync(filename)) {
 		// console.log(String(fs.readFileSync(filename)));
 		const filecontent = String(fs.readFileSync(filename));
-		if (debugMode) console.time("Execution took");
-		const result = new ExecProc(
-			filecontent,
-			filename,
-			filename.toLowerCase().startsWith("c:") ||
+		const fn = filename.toLowerCase().startsWith("c:") ||
 			filename.toLowerCase().startsWith("home") ||
 			filename.toLowerCase().startsWith("~") ||
 			filename.toLowerCase().startsWith("/")
 				? filename
-				: `${process.cwd()}\\${filename}`
+				: `${process.cwd()}\\${filename}`;
+		if (debugMode) console.time("Execution took");
+		const result = new ExecProc(
+			filecontent,
+			filename,
+			fn
 		);
 		console.log(
 			"Result execution process: " + JSON.stringify(result.output, null, 4)
