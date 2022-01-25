@@ -589,7 +589,7 @@ module.exports = class Interpreter {
 					);
 				} else {
 					throw new Error(
-						`Cannot assign variable '${node?.variable?.value}' without 'let' or 'var' keyword (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
+						`Cannot assign variable '${node?.variable?.value}' without 'let', 'var' or 'const' keyword (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
 					);
 				}
 			}
