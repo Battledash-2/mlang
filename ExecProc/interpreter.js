@@ -47,7 +47,12 @@ module.exports = class Interpreter {
 		this.exports = {};
 		this.returnExports = returnExports;
 
-		this.pos;
+		this.pos = {
+			position: {
+				line: 0,
+				cursor: 0
+			}
+		};
 
 		this.conversions = require("./core/convert");
 
