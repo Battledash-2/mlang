@@ -114,7 +114,7 @@ module.exports = class Interpreter {
 			);
 		}
 		
-		if (this.local.hasOwnProperty(name) && this.local[name]?.constant == true) throw new Error(`Attempt to overwrite a constant variable '${name}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+		if (this.local.hasOwnProperty(name) && this.local[name]?.constant == true) throw new Error(`Attempt to overwrite a constant variable '${name}' (${this.fn}:${this.pos?.position?.line ?? 0}:${this.pos?.position?.cursor ?? 0})`);
 
 		if (name.startsWith("$")) {
 			this.local[this.local[name]?.ref].value = value;
@@ -289,7 +289,7 @@ module.exports = class Interpreter {
 	}
 
 	assign(variable, operation, operator) {
-		if (this.local.hasOwnProperty(variable.value) && this.local[variable.value].constant == true) throw new Error(`Attempt to overwrite a constant variable '${variable.value}' (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`);
+		if (this.local.hasOwnProperty(variable.value) && this.local[variable.value].constant == true) throw new Error(`Attempt to overwrite a constant variable '${variable.value}' (${this.fn}:${this.pos?.position?.line ?? 0}:${this.pos?.position?.cursor ?? 0})`);
 		if (!operation.hasOwnProperty("left")) {
 			operation = this.loop(operation)?.value;
 		} else {
