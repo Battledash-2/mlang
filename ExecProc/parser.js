@@ -325,6 +325,7 @@ module.exports = class Parser {
 	}
 
 	emptyStatement() {
+		this.advance();
 		return {
 			type: "Empty"
 		};
