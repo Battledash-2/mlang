@@ -121,13 +121,15 @@ module.exports = class Tokenizer {
 					// console.log(newlines, 'n', newlines?.length);
 					// return this.nextToken();
 					var to = match.indexOf("*/") > -1 ? match.indexOf("*/") : 0;
-					this.line += match.slice(0, to).match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
-					this.pos = 0;
+					var line = match.slice(0, to).match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
+					this.line += line;
+					this.pos = line > 0 ? 0 : this.pos;
 					return this.nextToken();
 				case "STRING":
-					var to = match.indexOf("*/") > -1 ? match.indexOf("*/") : 0;
-					this.line += match.slice(1).match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
-					this.pos = 0;
+					var to = match.slice(1).indexOf("\`") > -1 ? match.slice(1).indexOf("\`") : 0;
+					var line = match.slice(1, to).match(/\n+/g)?.length > -1 ? match.match(/\n+/g).length : 0;
+					this.line += line;
+					this.pos = line > 0 ? 0 : this.pos;
 					break;
 			}
 
@@ -138,7 +140,7 @@ module.exports = class Tokenizer {
 					cursor: this.pos-(match.length-1),
 					line: this.line+1
 				}
-			};
+			};;
 		}
 
 		throw new Error(`Unexpected token '${string.slice(0, 1)}' at ${this.fn}:${this.line+1}:${this.pos+1}`);
