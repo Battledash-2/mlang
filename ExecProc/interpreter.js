@@ -38,7 +38,7 @@ module.exports = class Interpreter {
 		this.fn = fn;
 		this.fp = fp;
 
-		this.global = require("./core/main")(null, this);
+		this.global = require("./core/main")(fn);
 		this.local = scope ?? new Scope(this.global);
 
 		this.userFunctions = functions ?? {}; // functions defined by user

@@ -2,25 +2,27 @@
 
 const Typeof = require("./typeof");
 module.exports = class InterpreterInterface {
-	constructor() {
+	constructor(fn) {
+		this.fn = fn;
 		return true;
 	}
 
 	// Functional
-	throwError(error, functionName, moduleName) {
+	throwError(error, functionName="N/A", moduleName="N/A", position) {
 		throw new Error(
-			`${error} in ${moduleName}/${functionName} (N/A)`
+			`${error} in ${moduleName}/${functionName} (${this.fn}:${position.line}:${position.cursor})`
 		);
 	}
 
 	// Arguments
-	expectArguments(amount=1, args, functionName="N/A", moduleName="N/A", allowMore) {
+	expectArguments(amount=1, args, functionName="N/A", moduleName="N/A", allowMore, pos) {
 		if (allowMore && this.argumentsLength(args) >= amount) return true;
 		if (this.argumentsLength(args) !== amount)
 			this.throwError(
 				`Expected ${amount} arguments, received ${this.argumentsLength(args)}`,
 				functionName,
-				moduleName
+				moduleName,
+				pos
 			);
 	}
 
@@ -82,13 +84,14 @@ module.exports = class InterpreterInterface {
 	typeAssert(type, arg) {
 		return arg?.type === type || Typeof(arg?.value) === type;
 	}
-	typeAssertError(type, arg, fname, mname) {
+	typeAssertError(type, arg, fname, mname, pos) {
 		if (arg?.type !== type && Typeof(arg?.value) !== type) {
 			console.log(arg)
 			this.throwError(
 				`Expected type '${type}', received '${arg?.type || "none"}'`,
 				fname,
-				mname
+				mname,
+				pos
 			);
 		}
 		return true;
@@ -97,12 +100,13 @@ module.exports = class InterpreterInterface {
 	typeAssertStrict(type, arg) {
 		return arg?.type == type;
 	}
-	typeAssertStrictError(type, arg, fname, mname) {
+	typeAssertStrictError(type, arg, fname, mname, pos) {
 		if (arg?.type !== type) {
 			this.throwError(
 				`Expected type '${type}', received '${arg?.type || "none"}'`,
 				fname,
-				mname
+				mname,
+				pos
 			);
 		}
 		return true;

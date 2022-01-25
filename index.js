@@ -64,7 +64,7 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 	};
 
 	let replScope = {
-		vars: require("./ExecProc/core/main")(Interpreter.createToken),
+		vars: require("./ExecProc/core/main")("runtime"),
 		funcs: {},
 		convs: {}
 	}

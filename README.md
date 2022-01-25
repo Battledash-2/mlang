@@ -12,7 +12,8 @@
 - Bug fix & constant variables (with `const` keyword)
 
 ## Known Bugs
-- No known bugs
+- UPDATED: `printf` and `format` functions now also include the position of an error (in the case one occurs)
+- FIXED: Error positioning was sometimes negative because of strings
 
 ## To-Do (in order from Most Important to Least Important)
 - [ ] Add 'import ... as ...'

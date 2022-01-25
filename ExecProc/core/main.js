@@ -16,18 +16,20 @@ const format = {
 	u: (v)=>"\u001b[4m"+v+"\u001b[0m", // underline
 }
 
-module.exports = (ct, it)=>{
+module.exports = (fn)=>{
 	// createToken = ct ?? createToken;
-	const handle = new Interface(it);
+	const handle = new Interface(fn);
 
 	function form(args) {
-		handle.expectArguments(1, args, "printf", "builtin", true);
-		
 		let str = handle.getArgumentObjectAt(args, 0);
+		const pos = str.position;
+
+		handle.expectArguments(1, args, "printf", "builtin", true, pos);
+		
 		const other = handle.getArgumentValues(args);
 		other.shift();
 
-		handle.typeAssertError("STRING", str, "printf", "builtin");
+		handle.typeAssertError("STRING", str, "printf", "builtin", pos);
 
 		str = str?.value ?? "";
 		let i = 0;
@@ -39,11 +41,11 @@ module.exports = (ct, it)=>{
 				const operator = match.slice(1);
 
 				if (format.hasOwnProperty(operator)) {
-					if (typeof val == "undefined") handle.throwError("Saw operator without a value", "format", "builtin");
+					if (typeof val == "undefined") handle.throwError("Saw operator without a value", "format", "builtin", pos);
 					return format[operator](val);
 				}
 
-				handle.throwError("Unknown operator '%"+operator+"': Try using a '\\'", "format", "builtin");
+				handle.throwError("Unknown operator '%"+operator+"': Try using a '\\'", "format", "builtin", pos);
 			});
 		} while (i < other.length);
 
@@ -51,11 +53,11 @@ module.exports = (ct, it)=>{
 			const operator = match.slice(1);
 
 			if (format.hasOwnProperty(operator)) {
-				if (typeof other.slice(-1)[0] == "undefined") handle.throwError("Saw operator without a value", "format", "builtin");
+				if (typeof other.slice(-1)[0] == "undefined") handle.throwError("Saw operator without a value", "format", "builtin", pos);
 				return format[operator](other.slice(-1)[0]);
 			}
 
-			handle.throwError("Unknown operator '%"+operator+"': Try using a '\\'", "format", "builtin");
+			handle.throwError("Unknown operator '%"+operator+"': Try using a '\\'", "format", "builtin", pos);
 		});
 
 		return Screen(str, true, false);
