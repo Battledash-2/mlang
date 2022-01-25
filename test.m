@@ -1,13 +1,15 @@
 let a = 10;
 if (a == 10) {
-	let a = a * 2;
+	a = a * 2;
 } else {
-	let a = a * 5;
+	a = a * 5;
 }
 print(a);
 if (a == 10) {
-	let a = a * 2;
+	a = a * 2;
 } else {
-	let a = a * 5;
+	a = a * 5;
 }
 print(a);
+
+// let a = 10;if (a == 10) {a = a * 2;} else {a = a * 5;}print(a);if (a == 10) {a = a * 2;} else {a = a * 5;}print(a);

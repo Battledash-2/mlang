@@ -40,12 +40,12 @@ module.exports = class Interpreter {
 
 		this.strictMode = strictMode ?? false;
 
-		scope.useStrict = ()=>{
-			this.strictMode = true;
-		}
-
 		this.global = require("./core/main")(fn);
 		this.local = scope ?? new Scope(this.global);
+
+		this.local.useStrict = ()=>{
+			this.strictMode = true;
+		}
 
 		this.userFunctions = functions ?? {}; // functions defined by user
 		this.userConversions = conversions ?? {};
