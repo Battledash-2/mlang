@@ -82,10 +82,11 @@ Copyright (c) 2022 Battledash-2 (& MLang)\n`);
 				if (debugMode) console.time("Execution took");
 				let result;
 				try {
-					result = new ExecProc(response, "runtime", "runtime", replScope.vars, replScope.funcs, replScope.convs);
+					result = new ExecProc(response, "runtime", "runtime", replScope.vars, replScope.funcs, replScope.convs, replScope.strict);
 					replScope["vars"] = result.scope;
 					replScope["funcs"] = result.functions;
 					replScope["convs"] = result.conversions;
+					replScope["strict"] = result.strict;
 					console.log(
 						result.output[0] == null
 							? "\u001b[1;35mundefined\u001b[0m"

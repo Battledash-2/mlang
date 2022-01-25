@@ -34,9 +34,15 @@ const binOperations = {
 };
 
 module.exports = class Interpreter {
-	constructor(ast, fn, fp, returnExports=false, scope, functions, conversions) {
+	constructor(ast, fn, fp, returnExports=false, scope, functions, conversions, strictMode=false) {
 		this.fn = fn;
 		this.fp = fp;
+
+		this.strictMode = strictMode ?? false;
+
+		scope.useStrict = ()=>{
+			this.strictMode = true;
+		}
 
 		this.global = require("./core/main")(fn);
 		this.local = scope ?? new Scope(this.global);
@@ -49,8 +55,8 @@ module.exports = class Interpreter {
 
 		this.pos = {
 			position: {
-				line: 0,
-				cursor: 0
+				line: 1,
+				cursor: 1
 			}
 		};
 
@@ -191,6 +197,7 @@ module.exports = class Interpreter {
 		} else {
 			return {
 				output: r,
+				strict: this.strictMode,
 				scope: this.local,
 				functions: this.userFunctions,
 				conversions: this.conversions
@@ -592,10 +599,18 @@ module.exports = class Interpreter {
 					throw new Error(
 						`Cannot change value of arrays (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
 					);
-				} else {
+				} else if(this.strictMode) {
 					throw new Error(
 						`Cannot assign variable '${node?.variable?.value}' without 'let', 'var' or 'const' keyword (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
 					);
+				} else {
+					this.createVar(
+						this.loop(node?.operation).value,
+						node?.variable?.value,
+						false,
+						false
+					);
+					return null;
 				}
 			}
 		}
