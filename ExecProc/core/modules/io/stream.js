@@ -21,7 +21,7 @@ module.exports["prompt"] = (prompt, mask)=>{
 
 	while (true) {
 		let read = fs.readSync(stdin, buf, 0, 3);
-		if (read > 1) { // most likely not a character
+		if (read > 1) { // most likely not a character (doesn't work on windows for some reason)
 			switch (buf.toString()) {
 				case "\u001b[D": // left arrow
 					var old = index;
