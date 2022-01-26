@@ -13,17 +13,5 @@ module.exports = class Process extends Interface {
 				this.throwError("Expected exactly 1 argument", "wait", "process");
 			}
 		});
-
-		// process/out.write
-		this.createFunction("process::out::write", (arg)=>{
-			let send = "";
-			if (this.argumentsLength(arg) > 1) {
-				send = arg.map(c=>Color(c)).join(" ");
-			} else {
-				send = Color(arg);
-			}
-
-			process.stdout.write(send);
-		});
 	}
 }
