@@ -63,32 +63,32 @@ module.exports = (fn)=>{
 		return Screen(str, true, false);
 	}
 
-    let num = 0;
-    return { // predefine functions an variables here (note: these can be overwritting by the user, although they cannot create functions)
-        "util.pi": {
+	let num = 0;
+	return { // predefine functions an variables here (note: these can be overwritting by the user, although they cannot create functions)
+		"util.pi": {
 			value: Math.PI,
 			constant: true
 		},
-        "util.enum": (_arg, _pos, caller)=>{return createToken("NUMBER", ++num, caller.position);},
-        "util.log": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value) || (arg?.value || ""), true, false)),
+		"util.enum": (_arg, _pos, caller)=>{return createToken("NUMBER", ++num, caller.position);},
+		"util.log": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value) || (arg?.value || ""), true, false)),
 		"print": (arg)=>console.log(Screen(arg?.map?.(c=>c?.value) || (arg?.value || ""), true, false)),
-        "printf": (args)=>{
+		"printf": (args)=>{
 			// expectArguments(amount=1, args, functionName="N/A", moduleName="N/A", allowMore) {
 			console.log(form(args));
 		},
 		"format": (args, pos)=>{
 			return createToken("STRING", form(args), pos.position); // can also do handle.createToken
 		},
-        "util.sin": (arg, pos)=>createToken("NUMBER", Math.sin(arg.value), pos.position),
-        "util.cosin": (arg, pos)=>createToken("NUMBER", Math.cos(arg.value), pos.position),
+		"util.sin": (arg, pos)=>createToken("NUMBER", Math.sin(arg.value), pos.position),
+		"util.cosin": (arg, pos)=>createToken("NUMBER", Math.cos(arg.value), pos.position),
 		"util.len": (arg, pos)=>createToken("NUMBER", arg.value.length, pos.position),
-        "util.strlen": (arg, pos)=>{
+		"util.strlen": (arg, pos)=>{
 			return createToken("NUMBER", String(arg.value).length, pos.position)
 		},
-        "util.has": (args, pos)=>createToken("BOOLEAN", args[0].value.includes(args[1].value), pos.position),
-        "util.typeof": (arg, _pos, caller)=>createToken("STRING", arg?.type ?? "NULL", caller?.position),
+		"util.has": (args, pos)=>createToken("BOOLEAN", args[0].value.includes(args[1].value), pos.position),
+		"util.typeof": (arg, _pos, caller)=>createToken("STRING", arg?.type ?? "NULL", caller?.position),
 
 		"NULL": (_arg, _pos, caller)=>createToken("NULL", "", caller?.position),
-        // ...require("./convert")(createToken)
-    }
+		// ...require("./convert")(createToken)
+	}
 };
