@@ -596,9 +596,12 @@ module.exports = class Interpreter {
 				);
 			} else {
 				if (node?.variable?.type == "ARRAY_SELECT") {
-					throw new Error(
-						`Cannot change value of arrays (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
-					);
+					// throw new Error(
+					// 	`Cannot change value of arrays (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
+					// );
+					const arrVal = this.loop(node?.variable); // javascript objects / arrays are pointers :)
+					arrVal.value = this.loop(node?.operation).value;
+					return null;
 				} else if(this.strictMode) {
 					throw new Error(
 						`Cannot assign variable '${node?.variable?.value}' without 'let', 'var' or 'const' keyword (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
