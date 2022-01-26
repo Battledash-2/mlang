@@ -7,7 +7,7 @@
 ## Project Status
 
 #### Version: v1.8.6
-- [x] Add options to modify a value in an array [***HIGH* PRIORITY**]
+- Add options to modify a value in an array [***HIGH* PRIORITY**]
 - IO utility (with a custom implementation for synchronous readline)
 
 ## Known Bugs
