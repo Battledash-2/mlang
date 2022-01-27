@@ -355,15 +355,7 @@ module.exports = class Interpreter {
 				return false;
 			}
 		} else {
-			if (
-				(this.varExists(node?.value) ||
-					node?.value > 0 ||
-					node?.value == true) &&
-				!(
-					node?.value == true ||
-					this.getVar(node?.value, false) == true
-				)
-			) {
+			if ((this.varExists(node?.value) || node?.value) || (node?.value == true || this.getVar(node?.value, false) == true)) {
 				return true;
 			} else {
 				return false;
@@ -387,15 +379,7 @@ module.exports = class Interpreter {
 				return this.start(node?.fail?.body).output[0] || null;
 			}
 		} else {
-			if (
-				(this.varExists(node?.condition?.value) ||
-					node?.condition?.value > 0 ||
-					node?.condition?.value == true) &&
-				!(
-					node?.condition?.value == true ||
-					this.getVar(node?.condition?.value, false) == true
-				)
-			) {
+			if ((this.varExists(node?.condition?.value) || node?.condition) || (node?.condition?.value == true || this.getVar(node?.condition?.value, false) == true)) {
 				return this.start(node?.pass?.body).output[0] || null;
 			} else if (node?.fail?.body != null) {
 				return this.start(node?.fail?.body).output[0] || null;
