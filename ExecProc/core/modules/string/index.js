@@ -118,6 +118,27 @@ module.exports = class StringUtil extends Interface {
 				);
 			},
 
+			matchAll: (args) => {
+				this.expectArguments(2, args, "match", "string", true); // spec
+
+				let stmo = this.getArgumentObjectAt(args, 0);
+				let stm = this.getArgumentObjectAt(args, 1);
+
+				this.typeAssertError("STRING", stmo, "match", "string"); // spec
+				this.typeAssertError("STRING", stm, "match", "string"); // spec
+
+				stmo = stmo.value;
+				stm = stm.value;
+
+				const matchWith = new RegExp(stm);
+
+				return {
+					type: "ARRAY",
+					values: this.getTokenListFrom(...stmo.match(matchWith) ?? [""]),
+					position: this.getPositionObject()
+				};
+			},
+
 			split: (args) => {
 				this.expectArguments(2, args, "split", "string");
 
@@ -130,7 +151,7 @@ module.exports = class StringUtil extends Interface {
 				this.typeAssertError("STRING", spl, "split", "string");
 
 				ao = ao.value;
-				spl = spl == "" ? spl : new RegExp(spl.value, flg);
+				spl = spl.value;
 
 				return {
 					type: "ARRAY",
