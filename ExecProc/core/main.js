@@ -90,7 +90,7 @@ module.exports = (fn)=>{
 
 		"NULL": (_arg, _pos, caller)=>createToken("NULL", "", caller?.position),
 
-		"util.argv": process.argv,
+		"util.argv": process.argv.map(c=>({type:"STRING",value:c,position:{line:0,cursor:0}})),
 		// ...require("./convert")(createToken)
 	}
 };
