@@ -130,7 +130,7 @@ module.exports = class StringUtil extends Interface {
 				this.typeAssertError("STRING", spl, "split", "string");
 
 				ao = ao.value;
-				spl = new RegExp(spl.value, flg);
+				spl = spl == "" ? spl : new RegExp(spl.value, flg);
 
 				return {
 					type: "ARRAY",
