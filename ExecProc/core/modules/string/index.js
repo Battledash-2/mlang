@@ -164,7 +164,7 @@ module.exports = class StringUtil extends Interface {
 				let ao = this.getArgumentObjectAt(args, 0);
 				let spl = this.getArgumentObjectAt(args, 1);
 
-				let flg = this.getArgumentAt(args, 2);
+				let flg = this.getArgumentObjectAt(args, 2);
 
 				this.typeAssertError("STRING", ao, "replace", "string");
 				this.typeAssertError("STRING", spl, "replace", "string");
@@ -187,7 +187,7 @@ module.exports = class StringUtil extends Interface {
 				let ao = this.getArgumentObjectAt(args, 0);
 				let spl = this.getArgumentObjectAt(args, 1);
 
-				let flg = this.getArgumentAt(args, 2);
+				let flg = this.getArgumentObjectAt(args, 2);
 
 				this.typeAssertError("STRING", ao, "replaceall", "string");
 				this.typeAssertError("STRING", spl, "replaceall", "string");

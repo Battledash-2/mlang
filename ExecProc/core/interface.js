@@ -213,7 +213,6 @@ module.exports = class InterpreterInterface {
 	}
 	typeAssertError(type, arg, fname, mname) {
 		if (arg?.type !== type && Typeof(arg?.value) !== type) {
-			console.log(arg)
 			this.throwError(
 				`Expected type '${type}', received '${arg?.type || "none"}'`,
 				fname,
