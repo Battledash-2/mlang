@@ -593,11 +593,14 @@ module.exports = class Interpreter {
 
 						return null;
 					}
+
+					let append = this.loop(node?.operation);
+					append.type = append?.valueType ?? append?.type;
 					
 					if (arr[this.loop(node?.variable?.goto)?.value] != null) {
-						arr[this.loop(node?.variable?.goto)?.value] = this.loop(node?.operation);
+						arr[this.loop(node?.variable?.goto)?.value] = append;
 					} else {
-						this.getVar(node?.variable?.array?.value).push(this.loop(node?.operation));
+						this.getVar(node?.variable?.array?.value).push(append);
 					}
 					return null;
 				} else if(this.strictMode) {
