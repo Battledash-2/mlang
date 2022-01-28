@@ -10,6 +10,10 @@
 - Add options to modify a value in an array [***HIGH* PRIORITY**]
 - IO utility (with a custom implementation for synchronous readline)
 
+## Package manager
+- There is a package manager under development by [justamirror](https://github.com/justamirror) that you can see [here](https://github.com/justamirror/MPM).
+- There isn't any official package manager as of now, if any others pop up they will be mentioned here.
+
 ## Known Bugs
 - UPDATED: `printf` and `format` functions now also include the position of an error (in the case one occurs)
 - FIXED: Error positioning was sometimes negative because of strings
