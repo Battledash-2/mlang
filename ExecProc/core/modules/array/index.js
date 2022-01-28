@@ -76,7 +76,7 @@ module.exports = class StringUtil extends Interface {
 		};
 
 		for (let fname in stringFunctions) {
-			this.createFunction("string::" + fname, stringFunctions[fname]);
+			this.createFunction("array::" + fname, stringFunctions[fname]);
 		}
 	}
 };
