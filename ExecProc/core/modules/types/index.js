@@ -11,6 +11,13 @@ module.exports = class Types extends Interface {
 
 			const obj = this.getArgumentObjectAt(args, 0);
 
+			return this.createToken("STRING", obj.valueType ?? Typeof(obj.value), this.getPositionObject());
+		});
+		this.createFunction("types::realof", (args)=>{
+			this.expectArguments(1, args, "of", "types", true);
+
+			const obj = this.getArgumentObjectAt(args, 0);
+
 			return this.createToken("STRING", obj.type, this.getPositionObject());
 		});
 		this.createFunction("types::create", (args)=>{
