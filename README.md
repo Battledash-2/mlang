@@ -11,7 +11,7 @@
 - IO utility (with a custom implementation for synchronous readline)
 
 ## Package manager
-- There is a package manager under development by [justamirror](https://github.com/justamirror) that you can see [here](https://github.com/justamirror).
+- There is a package manager under development by [justamirror](https://github.com/justamirror) that you can see [here](https://github.com/justamirror/MPM).
 - There isn't any official package manager as of now, if any others pop up they will be mentioned here.
 
 ## Known Bugs
