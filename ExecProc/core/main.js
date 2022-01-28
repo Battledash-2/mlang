@@ -91,6 +91,9 @@ module.exports = (fn)=>{
 		"NULL": (_arg, _pos, caller)=>createToken("NULL", "", caller?.position),
 
 		"util.argv": process.argv.map(c=>({type:"STRING",value:c,position:{line:0,cursor:0}})),
+
+		"isNaN": (arg, pos)=>createToken("BOOLEAN", isNaN(arg.value), pos.position),
+		"isNull": (arg, pos)=>createToken("BOOLEAN", arg == null || arg.value == null, pos.position),
 		// ...require("./convert")(createToken)
 	}
 };

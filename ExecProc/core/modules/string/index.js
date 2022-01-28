@@ -134,7 +134,7 @@ module.exports = class StringUtil extends Interface {
 
 				return {
 					type: "ARRAY",
-					value: this.getTokenListFrom(...stmo.matchAll(matchWith) ?? [""]),
+					value: this.getTokenListFrom(...stmo.match(matchWith) ?? []),
 					position: this.getPositionObject()
 				};
 			},
