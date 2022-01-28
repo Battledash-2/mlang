@@ -63,7 +63,6 @@ module.exports = class StringUtil extends Interface {
 					this.getArgumentObjectAt(args, 2) ||
 					this.getTokenFrom(stmo?.value?.length);
 
-				this.typeAssertError("ARRAY", stmo, "index", "array");
 				this.typeAssertError("NUMBER", si1, "index", "array");
 				this.typeAssertError("NUMBER", si2, "index", "array");
 
