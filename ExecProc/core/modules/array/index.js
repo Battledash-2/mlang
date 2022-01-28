@@ -11,8 +11,8 @@ module.exports = class StringUtil extends Interface {
 				const stmo = this.getArgumentObjectAt(args, 0);
 				const char = this.getArgumentObjectAt(args, 1);
 
-				this.typeAssertError("STRING", stmo, "indexof", "array");
-				this.typeAssertError("STRING", char, "indexof", "array");
+				this.typeAssertError("ARRAY", stmo, "indexof", "array");
+				this.typeAssertError("NUMBER", char, "indexof", "array");
 
 				return this.createToken(
 					"NUMBER",
@@ -27,7 +27,7 @@ module.exports = class StringUtil extends Interface {
 				const stmo = this.getArgumentObjectAt(args, 0);
 				const char = this.getArgumentObjectAt(args, 1);
 
-				this.typeAssertError("STRING", stmo, "at", "array");
+				this.typeAssertError("ARRAY", stmo, "at", "array");
 				this.typeAssertError("NUMBER", char, "at", "array");
 
 				return this.createToken(
@@ -43,7 +43,7 @@ module.exports = class StringUtil extends Interface {
 				const stmo = this.getArgumentObjectAt(args, 0);
 				const char = this.getArgumentObjectAt(args, 1);
 
-				this.typeAssertError("STRING", stmo, "at", "array");
+				this.typeAssertError("ARRAY", stmo, "at", "array");
 				this.typeAssertError("NUMBER", char, "at", "array");
 
 				return this.createToken(
