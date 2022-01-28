@@ -398,9 +398,15 @@ module.exports = class Interpreter {
 
 		if (node?.type == "ARRAY") {
 			node.values = node?.values ?? node?.value;
+			let vals;
+			if (typeof node?.values[0] == "undefined") {
+				vals = [];
+			} else {
+				vals = node?.values.map?.((c) => this.loop(c));
+			}
 			return {
 				type: "ARRAY",
-				value: node?.values.map?.((c) => this.loop(c)),
+				value: vals,
 				position: node?.position,
 			};
 		}
@@ -584,7 +590,12 @@ module.exports = class Interpreter {
 					// 	`Cannot change value of arrays (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
 					// );
 					const arrVal = this.loop(node?.variable); // javascript objects / arrays are pointers :)
-					arrVal.value = this.loop(node?.operation).value;
+					if (arrVal?.value != null) {
+						arrVal.value = this.loop(node?.operation).value;
+					} else {
+						// console.log(node?.variable?.array?.value);
+						this.getVar(node?.variable?.array?.value).push(this.loop(node?.operation));
+					}
 					return null;
 				} else if(this.strictMode) {
 					throw new Error(
