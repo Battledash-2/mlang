@@ -118,7 +118,7 @@ module.exports = class StringUtil extends Interface {
 				);
 			},
 
-			matchAll: (args) => {
+			matchall: (args) => {
 				this.expectArguments(2, args, "match", "string", true); // spec
 
 				let stmo = this.getArgumentObjectAt(args, 0);
@@ -130,11 +130,11 @@ module.exports = class StringUtil extends Interface {
 				stmo = stmo.value;
 				stm = stm.value;
 
-				const matchWith = new RegExp(stm);
+				const matchWith = new RegExp(stm, "g");
 
 				return {
 					type: "ARRAY",
-					values: this.getTokenListFrom(...stmo.match(matchWith) ?? [""]),
+					value: this.getTokenListFrom(...stmo.matchAll(matchWith) ?? [""]),
 					position: this.getPositionObject()
 				};
 			},
@@ -155,7 +155,7 @@ module.exports = class StringUtil extends Interface {
 
 				return {
 					type: "ARRAY",
-					values: this.getTokenListFrom(...ao.split(spl)),
+					value: this.getTokenListFrom(...ao.split(spl)),
 					position: this.getPositionObject()
 				};
 			},
