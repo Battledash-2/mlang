@@ -286,7 +286,7 @@ module.exports = class Interpreter {
 						position: c.position,
 					};
 				}
-				return c;
+				return this.loop(c);
 			});
 		} else {
 			arg = node.arg != null ? this.loop(node.arg) : node.arg;
