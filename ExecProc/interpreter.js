@@ -626,7 +626,7 @@ module.exports = class Interpreter {
 
 			this.start(dec, false);
 			while (this.conditionPass(sta)) {
-				if (this.start(dow?.body, true).output[0]?.type == "BREAK") break;
+				if (this.start(dow?.body, false).output[0]?.type == "BREAK") break;
 			}
 
 			this.local = this.local["%PAR"];
