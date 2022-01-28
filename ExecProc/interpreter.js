@@ -448,7 +448,7 @@ module.exports = class Interpreter {
 		if (node?.type == "IDENTIFIER") {
 			this.pos = node;
 
-			let value = node?.value;
+			let value = node?.name ?? node?.value;
 			if (!this.userFunctions.hasOwnProperty(value)) {
 				value = this.getVar(value, errorOnUndefined);
 			}
