@@ -89,6 +89,7 @@ module.exports = (fn)=>{
 		"util.typeof": (arg, _pos, caller)=>createToken("STRING", arg?.type ?? "NULL", caller?.position),
 
 		"NULL": (_arg, _pos, caller)=>createToken("NULL", "", caller?.position),
+		"DEL": (_arg, _pos, caller)=>createToken("DELETE", "", caller.position),
 
 		"util.argv": process.argv.map(c=>({type:"STRING",value:c,position:{line:0,cursor:0}})),
 		// ...require("./convert")(createToken)

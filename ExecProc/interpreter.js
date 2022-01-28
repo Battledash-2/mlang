@@ -586,14 +586,17 @@ module.exports = class Interpreter {
 				);
 			} else {
 				if (node?.variable?.type == "ARRAY_SELECT") {
-					// throw new Error(
-					// 	`Cannot change value of arrays (${this.fn}:${this.pos?.position?.line}:${this.pos?.position?.cursor})`
-					// );
-					const arrVal = this.loop(node?.variable); // javascript objects / arrays are pointers :)
-					if (arrVal?.value != null) {
-						arrVal.value = this.loop(node?.operation).value;
+					const arr = this.getVar(node?.variable?.array?.value); // javascript objects / arrays are pointers :)
+					
+					if (this.loop(node?.operation)?.type == "DELETE") {
+						arr.splice(this.loop(node?.variable?.goto)?.value, 1);
+
+						return null;
+					}
+					
+					if (arr[this.loop(node?.variable?.goto)?.value] != null) {
+						arr[this.loop(node?.variable?.goto)?.value] = this.loop(node?.operation);
 					} else {
-						// console.log(node?.variable?.array?.value);
 						this.getVar(node?.variable?.array?.value).push(this.loop(node?.operation));
 					}
 					return null;
