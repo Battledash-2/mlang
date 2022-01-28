@@ -176,7 +176,7 @@ module.exports = class StringUtil extends Interface {
 
 				return {
 					type: "STRING",
-					value: ao.replace(new Regex(spl), flg),
+					value: ao.replace(new RegExp(spl), flg),
 					position: this.getPositionObject()
 				};
 			},
@@ -199,7 +199,7 @@ module.exports = class StringUtil extends Interface {
 
 				return {
 					type: "STRING",
-					value: ao.replace(new Regex(spl, "g"), flg),
+					value: ao.replace(new RegExp(spl, "g"), flg),
 					position: this.getPositionObject()
 				};
 			},
