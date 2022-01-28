@@ -594,7 +594,7 @@ module.exports = class Interpreter {
 						return null;
 					}
 
-					let append = this.loop(node?.operation);
+					let append = this.loop(node?.operation) ?? {};
 					append.type = append?.valueType ?? append?.type;
 					
 					if (arr[this.loop(node?.variable?.goto)?.value] != null) {
