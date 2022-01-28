@@ -24,11 +24,15 @@ module.exports = class Parser {
 			}
 		}
 
-		if (this.advance("BOPEN").type != "BCLOSE") {
-			loop();
+		if (this.next.type == "BOPEN") {
+			if (this.advance("BOPEN").type != "BCLOSE") {
+				loop();
+			}
+			
+			this.advance("BCLOSE");
+		} else {
+			body.push(this.primary());
 		}
-		
-		this.advance("BCLOSE");
 		return {
 			type: "BLOCK",
 			body

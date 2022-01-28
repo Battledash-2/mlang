@@ -1,6 +1,6 @@
 {
 	"name": "mlang",
-	"version": "1.8.5patch-6",
+	"version": "1.8.7",
 	"description": "M Lang - The Arithmetic Language: M is an open-source language that is meant to help people learn about Tokenizers, Parsers, and interpreters. It supports variables, logging, built-in functions and expressions.",
 	"main": "index.js",
 	"scripts": {

@@ -1,4 +1,4 @@
-# MLang (v1.8.6): The Mathematics Language
+# MLang (v1.8.7): The Mathematics Language
 
 ## What is M
 
@@ -6,15 +6,16 @@
 
 ## Project Status
 
-#### Version: v1.8.6
-- Add options to modify a value in an array [***HIGH* PRIORITY**]
-- IO utility (with a custom implementation for synchronous readline)
+#### Version: v1.8.7
+- If a `{ block }` is expected but a `{` isn't seen, it will allow a single expression to pass (which also means there is support for `else if`)
 
 ## Package manager
 - There is a package manager under development by [justamirror](https://github.com/justamirror) that you can see [here](https://github.com/justamirror/MPM).
 - There isn't any official package manager as of now, if any others pop up they will be mentioned here.
 
 ## Known Bugs
+- PENDING: `print` with multiple arguments prints an array instead of formatting all args
+- PENDING: Can't return a variable
 - UPDATED: `printf` and `format` functions now also include the position of an error (in the case one occurs)
 - FIXED: Error positioning was sometimes negative because of strings
 
