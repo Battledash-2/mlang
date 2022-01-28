@@ -409,6 +409,7 @@ module.exports = class Parser {
 			const right = this.unary();
 
 			left = {
+				type: "OPERATION",
 				operator,
 				left,
 				right
