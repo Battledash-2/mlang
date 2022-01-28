@@ -145,8 +145,6 @@ module.exports = class StringUtil extends Interface {
 				let ao = this.getArgumentObjectAt(args, 0);
 				let spl = this.getArgumentObjectAt(args, 1);
 
-				const flg = this.getArgumentAt(args, 2) || "g";
-
 				this.typeAssertError("STRING", ao, "split", "string");
 				this.typeAssertError("STRING", spl, "split", "string");
 
@@ -156,6 +154,52 @@ module.exports = class StringUtil extends Interface {
 				return {
 					type: "ARRAY",
 					value: this.getTokenListFrom(...ao.split(spl)),
+					position: this.getPositionObject()
+				};
+			},
+
+			replace: (args) => {
+				this.expectArguments(3, args, "replace", "string");
+
+				let ao = this.getArgumentObjectAt(args, 0);
+				let spl = this.getArgumentObjectAt(args, 1);
+
+				const flg = this.getArgumentAt(args, 2);
+
+				this.typeAssertError("STRING", ao, "replace", "string");
+				this.typeAssertError("STRING", spl, "replace", "string");
+				this.typeAssertError("STRING", flg, "replace", "string");
+
+				ao = ao.value;
+				spl = spl.value;
+				flg = flg.value;
+
+				return {
+					type: "STRING",
+					value: ao.replace(new Regex(spl), flg),
+					position: this.getPositionObject()
+				};
+			},
+
+			replaceall: (args) => {
+				this.expectArguments(3, args, "replaceall", "string");
+
+				let ao = this.getArgumentObjectAt(args, 0);
+				let spl = this.getArgumentObjectAt(args, 1);
+
+				const flg = this.getArgumentAt(args, 2);
+
+				this.typeAssertError("STRING", ao, "replaceall", "string");
+				this.typeAssertError("STRING", spl, "replaceall", "string");
+				this.typeAssertError("STRING", flg, "replaceall", "string");
+
+				ao = ao.value;
+				spl = spl.value;
+				flg = flg.value;
+
+				return {
+					type: "STRING",
+					value: ao.replace(new Regex(spl, "g"), flg),
 					position: this.getPositionObject()
 				};
 			},
